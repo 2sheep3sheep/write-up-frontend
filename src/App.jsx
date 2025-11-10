@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import WelcomeScreen from './components/WelcomeScreen';
 import SignUpScreen from './components/SignUpScreen';
 import LoginScreen from './components/LoginScreen';
+import HomeScreen from './components/HomeScreen';
 
 const pageVariants = {
   initial: direction => ({
@@ -26,13 +27,13 @@ const pageVariants = {
 };
 
 export default function App() {
-  const [screen, setScreen] = useState('welcome'); // welcome | signup | login
+  const [screen, setScreen] = useState('welcome'); // welcome | signup | login | home
   // direction: +1 moving forward, -1 moving back (controls slide direction)
   const [direction, setDirection] = useState(1);
 
   function goTo(next) {
-    // simple heuristic: welcome <-> signup <-> login ordering
-    const order = { welcome: 0, signup: 1, login: 2 };
+    // simple heuristic: welcome <-> signup <-> login <-> home ordering
+    const order = { welcome: 0, signup: 1, login: 2, home: 3 };
     setDirection(order[next] >= order[screen] ? 1 : -1);
     setScreen(next);
   }
@@ -64,7 +65,7 @@ export default function App() {
             exit="exit"
             style={{ width: '100%' }}
           >
-            <SignUpScreen onLogin={() => goTo('login')} />
+            <SignUpScreen onLogin={() => goTo('login')} onRegisterSuccess={() => goTo('home')} />
           </motion.div>
         )}
 
@@ -78,7 +79,21 @@ export default function App() {
             exit="exit"
             style={{ width: '100%' }}
           >
-            <LoginScreen onSignUp={() => goTo('signup')} />
+            <LoginScreen onSignUp={() => goTo('signup')} onLoginSuccess={() => goTo('home')} />
+          </motion.div>
+        )}
+
+        {screen === 'home' && (
+          <motion.div
+            key="home"
+            custom={direction}
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            style={{ width: '100%' }}
+          >
+            <HomeScreen setScreen={setScreen} />
           </motion.div>
         )}
       </AnimatePresence>

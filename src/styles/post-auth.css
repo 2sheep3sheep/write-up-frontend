@@ -1,0 +1,21 @@
+/* Basic button */
+.basic-btn {
+    width: 25%;
+    height: 35px;
+    border-radius: 16px;
+    background: #0b3b5a;
+    color: var(--cta-blue);
+    font-weight: 700;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 18px rgba(59, 34, 34, 0.18);
+    margin-top: 6px;
+}
+
+.basic-btn:active {
+    transform: translateY(1px);
+}

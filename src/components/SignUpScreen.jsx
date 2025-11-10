@@ -1,8 +1,22 @@
 import React, { useState } from 'react';
 import LogoCard from './LogoCard';
+import { ClipLoader } from "react-spinners";
 
-export default function SignUpScreen({ onLogin = () => {} }) {
+export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = () => { } }) {
   const [isAuthor, setIsAuthor] = useState(false);
+  const [registerCall, setRegisterCall] = useState({ state: "inactive" });
+
+  const handleRegister = () => {
+    // TODO: when backend ready -> fetch('/auth/login', {method:'POST', body: JSON.stringify({email,password})})
+    // temporary: simulate loading and success
+
+    setRegisterCall({ state: "pending" });
+
+    setTimeout(() => {
+      setRegisterCall({ state: "success" });
+      onRegisterSuccess();
+    }, 2000);
+  }
 
   return (
     <div className="auth-root">
@@ -31,7 +45,12 @@ export default function SignUpScreen({ onLogin = () => {} }) {
           </>
         )}
 
-        <button className="cta" style={{ marginTop: 18 }}>Sign up</button>
+        <button className="cta" onClick={handleRegister} style={{ marginTop: 18 }}>{
+          registerCall.state === "pending" ?
+            <ClipLoader color="white" size={20} /> : "Sign up"
+        }
+        </button>
+
         <button className="link" onClick={onLogin}>Already have an account? Log in</button>
       </div>
     </div>
