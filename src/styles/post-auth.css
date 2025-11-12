@@ -53,3 +53,43 @@
     justify-content: center;
     box-shadow: 0 6px 4px rgba(59, 34, 34, 0.18);
 }
+
+.back-arrow:active {
+    transform: translateY(1px);
+}
+
+.navbar-button {
+    padding: 4px;
+    font-weight: 700;
+    font-size: 14px;
+    border-radius: 16px;
+    border: none;
+    cursor: pointer;
+    background-color: var(--bg-top);
+    color:white;
+}
+
+.navbar-button:hover {
+    background-color: white;
+    color:black;
+}
+
+.navbar-button:active {
+    transform: translateY(1px);
+}
+
+.navbar-left {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: 1px solid rgba(0,0,0, 0.3);
+}
+
+.navbar-middle {
+    border-radius: 0;
+    border-right: 1px solid rgba(0,0,0, 0.3);
+}
+
+.navbar-right {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
