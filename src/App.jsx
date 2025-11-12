@@ -39,7 +39,7 @@ export default function App() {
   }
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div style={{ position:"relative", width:"100%", height:"100%", overflowX:"hidden"}}>
       <AnimatePresence mode="wait" initial={false}>
         {screen === 'welcome' && (
           <motion.div

@@ -29,6 +29,16 @@
     background-color: none;
 }
 
+.page-footer {
+    position: fixed;
+    bottom: 0;
+    display: flex;
+    color: white;
+    align-items: center;
+    justify-content: center;
+    background-color: none;
+}
+
 .back-arrow {
     padding: 4px;
     padding-right: 8px;
