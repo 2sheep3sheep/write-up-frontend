@@ -19,3 +19,27 @@
 .basic-btn:active {
     transform: translateY(1px);
 }
+
+
+.page-header {
+    display: flex;
+    color: white;
+    align-items: center;
+    justify-content: center;
+    background-color: none;
+}
+
+.back-arrow {
+    padding: 4px;
+    padding-right: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    border-radius: 16px;
+    border: none;
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 4px rgba(59, 34, 34, 0.18);
+}
