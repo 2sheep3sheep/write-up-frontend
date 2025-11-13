@@ -31,20 +31,20 @@ function HomeScreen({ setScreen }) {
     }
 
     return (
-        <div> 
+        <div>
 
-            <div style={{width:"100%", minHeight:"10vh", fontSize:"20px", display:"flex", justifyContent:"space-between", boxSizing:"border-box", padding:"0 20px 0 20px"}} className="page-header">
-                <BackArrow onClick={ e => setScreen("/") }/>
-                <button className="basic-btn" onClick={handleLogout} style={{width:"10vh", backgroundColor:"var(--bg-bottom)"}}>{
-                        logoutCall.state === "pending" ? <ClipLoader color="var(--color-primary)" size={20} /> : "Logout"
-                    }
+            <div style={{ width: "100%", minHeight: "10vh", fontSize: "20px", display: "flex", justifyContent: "space-between", boxSizing: "border-box", padding: "0 20px 0 20px" }} className="page-header">
+                <BackArrow onClick={e => setScreen("/")} />
+                <button className="basic-btn" onClick={handleLogout} style={{ width: "10vh", backgroundColor: "var(--bg-bottom)" }}>{
+                    logoutCall.state === "pending" ? <ClipLoader color="var(--color-primary)" size={20} /> : "Logout"
+                }
                 </button>
-                
-                <h1 style={{ textAlign: 'center', position:"absolute", left:"10%", right:"10%"}}>My Books (placeholder)</h1>
+
+                <h1 style={{ textAlign: 'center', position: "absolute", left: "10%", right: "10%" }}>Home (placeholder)</h1>
             </div>
 
             <div style={{ minHeight: '100vh', padding: 20 }}>
-                
+
                 <p style={{ textAlign: 'center' }}>You are logged in (mock). Next: build MyBooks screen.</p>
 
                 <div style={{ display: 'flex', justifyContent: 'center', marginTop: 18 }}>
@@ -52,12 +52,12 @@ function HomeScreen({ setScreen }) {
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'center', marginTop: 24 }}>
-                    
+
                 </div>
             </div>
 
-            <div style={{width:"100%", minHeight:"15vh", fontSize:"20px", display:"flex", justifyContent:"space-evenly", overflow:"clip"}} className="page-footer">
-                <PageNavbar/>
+            <div style={{ width: "100%", minHeight: "15vh", fontSize: "20px", display: "flex", justifyContent: "space-evenly", overflow: "clip" }} className="page-footer">
+                <PageNavbar />
             </div>
 
         </div>

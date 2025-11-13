@@ -43,12 +43,12 @@ export default function App() {
 
   // URI-based route switching
   return (
-    <div style={{ position:"relative", width:"100%", height:"100%", overflowX:"hidden"}}>
+    <div style={{ position: "relative", width: "100%", height: "100%", overflowX: "hidden" }}>
       <Routes>
-        <Route path="/" element={<WelcomeScreen onGetStarted={() => navTo('/signup')} onLogin={() => navTo('/login')} />}/>
-        <Route path="/login" element={<LoginScreen onSignUp={() => navTo('signup')} onLoginSuccess={() => navTo('home')} />}/>
-        <Route path="/signup" element={<SignUpScreen onLogin={() => navTo('login')} onRegisterSuccess={() => navTo('home')} />}/>
-        <Route path="/home" element={<HomeScreen setScreen={navTo} />}/>
+        <Route path="/" element={<WelcomeScreen onGetStarted={() => navTo('/signup')} onLogin={() => navTo('/login')} />} />
+        <Route path="/login" element={<LoginScreen onSignUp={() => navTo('signup')} onLoginSuccess={() => navTo('home')} />} />
+        <Route path="/signup" element={<SignUpScreen onLogin={() => navTo('login')} onRegisterSuccess={() => navTo('home')} />} />
+        <Route path="/home" element={<HomeScreen setScreen={navTo} />} />
       </Routes>
     </div>
   );
@@ -63,7 +63,7 @@ export default function App() {
 
   // Previous state-based route switching, with animations
   return (
-    <div style={{ position:"relative", width:"100%", height:"100%", overflowX:"hidden"}}>
+    <div style={{ position: "relative", width: "100%", height: "100%", overflowX: "hidden" }}>
       <AnimatePresence mode="wait" initial={false}>
         {screen === 'welcome' && (
           <motion.div

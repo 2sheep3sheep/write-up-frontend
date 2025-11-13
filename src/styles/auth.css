@@ -37,8 +37,7 @@ body,
 
 .auth-container {
   width: 100%;
-  max-width: 420px;
-  padding: 36px 20px 80px;
+  max-width: 350px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -52,18 +51,17 @@ body,
 
 .auth-container-signup {
   min-height: 100vh;
-  padding-top: 160px;
+  padding-top: 50px;
 }
 
 .auth-container-signup.author-mode {
-  padding-top: 160px;
-  /* Keep same on mobile */
+  padding-top: 50px;
 }
 
+/* Set the same padding on laptop during author mode */
 @media (min-width: 768px) {
   .auth-container-signup.author-mode {
-    padding-top: 488px;
-    /* Only increase on laptop */
+    padding-top: 50px;
   }
 }
 

@@ -4,18 +4,18 @@ import PersonIcon from '@mui/icons-material/Person';
 
 function PageNavbar(props) {
     return (
-        <div style={{width:"min-content", justifyContent:"space-evenly", display:"flex", height:"8vh"}}>
-            <button className='navbar-button navbar-left' style={{display:"block", width:"12vh", textAlign:"center", fontSize:"14px"}}>
-                <HomeIcon style={{fontSize:"30px"}}/>
-                 <div>Home</div>
+        <div style={{ width: "min-content", justifyContent: "space-evenly", display: "flex", height: "8vh" }}>
+            <button className='navbar-button navbar-left' style={{ display: "block", width: "12vh", textAlign: "center", fontSize: "14px" }}>
+                <HomeIcon style={{ fontSize: "30px" }} />
+                <div>Home</div>
             </button>
-            <button className='navbar-button navbar-middle' style={{display:"block", width:"12vh", textAlign:"center", fontSize:"14px"}}>
-            <MenuBookIcon style={{fontSize:"30px"}}/>
-                 <div>My Books</div>
+            <button className='navbar-button navbar-middle' style={{ display: "block", width: "12vh", textAlign: "center", fontSize: "14px" }}>
+                <MenuBookIcon style={{ fontSize: "30px" }} />
+                <div>My Books</div>
             </button>
-            <button className='navbar-button navbar-right' style={{display:"block", width:"12vh", textAlign:"center", fontSize:"14px"}}>
-            <PersonIcon style={{fontSize:"30px"}}/>
-                 <div>Profile</div>
+            <button className='navbar-button navbar-right' style={{ display: "block", width: "12vh", textAlign: "center", fontSize: "14px" }}>
+                <PersonIcon style={{ fontSize: "30px" }} />
+                <div>Profile</div>
             </button>
         </div>
     )

@@ -1,6 +1,6 @@
 /* Basic button */
 .basic-btn {
-    width: 25%;
+    width: 7% !important;
     height: 35px;
     border-radius: 16px;
     background: #0b3b5a;
@@ -40,6 +40,7 @@
 }
 
 .back-arrow {
+    width: 7%;
     padding: 4px;
     padding-right: 8px;
     font-weight: 700;
@@ -59,19 +60,20 @@
 }
 
 .navbar-button {
+    height: 57px;
     padding: 4px;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 12px !important;
     border-radius: 16px;
     border: none;
     cursor: pointer;
     background-color: var(--bg-top);
-    color:white;
+    color: white;
 }
 
 .navbar-button:hover {
     background-color: white;
-    color:black;
+    color: black;
 }
 
 .navbar-button:active {
@@ -81,12 +83,12 @@
 .navbar-left {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
-    border-right: 1px solid rgba(0,0,0, 0.3);
+    border-right: 1px solid rgba(0, 0, 0, 0.3);
 }
 
 .navbar-middle {
     border-radius: 0;
-    border-right: 1px solid rgba(0,0,0, 0.3);
+    border-right: 1px solid rgba(0, 0, 0, 0.3);
 }
 
 .navbar-right {

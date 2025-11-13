@@ -19,8 +19,9 @@ export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = 
   }
 
   return (
-    <div className="auth-root">
-      <div className={`auth-container auth-container-signup ${isAuthor ? 'author-mode' : ''}`} >
+    <div className="auth-root signup-root">
+      <div className={`auth-container auth-container-signup ${isAuthor ? 'author-mode' : ''}`}
+        style={{ minHeight: "100vh" }}>
         <LogoCard />
         <h1 className="title">Welcome</h1>
         <p className="subtitle">Sign up to get started</p>
@@ -51,7 +52,7 @@ export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = 
         }
         </button>
 
-        <button className="link" onClick={onLogin}>Already have an account? Log in</button>
+        <button style={{ marginBottom: 50 }} className="link" onClick={onLogin}>Already have an account? Log in</button>
       </div>
     </div>
   );
