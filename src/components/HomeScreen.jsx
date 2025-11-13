@@ -40,7 +40,7 @@ function HomeScreen({ setScreen }) {
                 }
                 </button>
 
-                <h1 style={{ textAlign: 'center', position: "absolute", left: "10%", right: "10%" }}>Home (placeholder)</h1>
+                <h1 style={{ textAlign: 'center', position: "absolute", left: "10%", right: "10%", marginTop: 50 }}>Home (placeholder)</h1>
             </div>
 
             <div style={{ minHeight: '100vh', padding: 20 }}>
