@@ -1,6 +1,6 @@
 /* Basic button */
 .basic-btn {
-    width: 25% !important;
+    width: 12% !important;
     height: 35px;
     border-radius: 16px;
     background: #0b3b5a;
@@ -16,9 +16,10 @@
     margin-top: 6px;
 }
 
-@media (min-width: 768px) {
+@media (max-width: 768px) {
     .basic-btn {
-        width: 7% !important;
+        width: 4vh !important;
+        font-size: 0;
     }
 }
 
@@ -46,7 +47,7 @@
 }
 
 .back-arrow {
-    width: 25%;
+    width: 9%;
     padding: 4px;
     padding-right: 8px;
     font-weight: 700;
@@ -61,11 +62,13 @@
     box-shadow: 0 6px 4px rgba(59, 34, 34, 0.18);
 }
 
-@media (min-width: 768px) {
+@media (max-width: 768px) {
     .back-arrow {
-        width: 7%;
+        width: 4vh;
+        font-size: 0;
     }
 }
+
 
 .back-arrow:active {
     transform: translateY(1px);
