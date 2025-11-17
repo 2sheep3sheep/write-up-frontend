@@ -6,16 +6,40 @@ export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = 
   const [isAuthor, setIsAuthor] = useState(false);
   const [registerCall, setRegisterCall] = useState({ state: "inactive" });
 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [validationState, setValidationState] = useState(
+    {
+      email:"valid",
+      password:"valid"
+    }
+  );
+
+  const password_re = new RegExp("^(?=.{10,}$)(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\sA-Za-z0-9])(?!.*\s).*$");
+
   const handleRegister = () => {
     // TODO: when backend ready -> fetch('/auth/login', {method:'POST', body: JSON.stringify({email,password})})
     // temporary: simulate loading and success
+    var isValid = true
+    var newValidationState = {
+      email:"valid",
+      password:"valid"
+    }
+    if ( !password_re.test(password) ) { isValid=false; newValidationState.password="Password must be at least 10 characters long and include an uppercase letter, a lowercase letter, a number, and a special character. Spaces are not allowed. (dev: abcdefghijkL+1)" }
 
-    setRegisterCall({ state: "pending" });
+    setValidationState(newValidationState)
 
-    setTimeout(() => {
-      setRegisterCall({ state: "success" });
-      onRegisterSuccess();
-    }, 2000);
+    if (isValid) {
+        setRegisterCall({ state: "pending" });
+
+        setTimeout(() => {
+          setRegisterCall({ state: "success" });
+          onRegisterSuccess();
+        }, 2000);
+    }else{
+        setValidationState(newValidationState)
+    }
   }
 
   return (
@@ -26,9 +50,11 @@ export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = 
         <h1 className="title">Welcome</h1>
         <p className="subtitle">Sign up to get started</p>
 
-        <input className="input" placeholder="Username" />
-        <input className="input" placeholder="Email" />
-        <input className="input" type="password" placeholder="Password" />
+        <input className="input" placeholder="Username"/>
+        <input className="input" placeholder="Email" value={email} onChange={ (e) => setEmail(e.target.value) }/>
+        <div className="error-message">{validationState.email != "valid" ? validationState.email : ""}</div>
+        <input className="input" type="password" placeholder="Password" value={password} onChange={ (e) => setPassword(e.target.value) }/>
+        <div className="error-message">{validationState.password != "valid" ? validationState.password : ""}</div>
 
         <div className="checkbox-row" onClick={() => setIsAuthor(!isAuthor)} style={{ cursor: 'pointer' }}>
           <div className={`checkbox ${isAuthor ? 'checked' : ''}`}>{isAuthor && <div className="tick" />}</div>

@@ -116,6 +116,12 @@ body,
   color: rgba(255, 255, 255, 0.4);
 }
 
+.error-message {
+  color: #f76363;
+  text-align: left;
+  width:100%;
+}
+
 .textarea {
   height: 120px;
   padding-top: 12px;
