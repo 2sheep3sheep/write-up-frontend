@@ -5,16 +5,38 @@ import { ClipLoader } from "react-spinners";
 export default function LoginScreen({ onSignUp = () => { }, onLoginSuccess = () => { } }) {
   const [loginCall, setLoginCall] = useState({ state: "inactive" });
 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [validationState, setValidationState] = useState(
+    {
+      email:"valid",
+      password:"valid"
+    }
+  );
+
   const handleLogin = () => {
     // TODO: when backend ready -> fetch('/auth/login', {method:'POST', body: JSON.stringify({email,password})})
     // temporary: simulate loading and success
+    var isValid = true
+    var newValidationState = {
+      email:"valid",
+      password:"valid"
+    }
 
-    setLoginCall({ state: "pending" });
+    if ( !password ) { isValid = false; newValidationState.password="Please enter your password"; }
+    if ( !email ) { isValid = false; newValidationState.email="Please enter your email"; }
 
-    setTimeout(() => {
-      setLoginCall({ state: "success" });
-      onLoginSuccess();
-    }, 2000);
+    setValidationState(newValidationState);
+
+    if (isValid) {
+      setLoginCall({ state: "pending" });
+
+      setTimeout(() => {
+        setLoginCall({ state: "success" });
+        onLoginSuccess();
+      }, 2000);
+    }
   }
 
   return (
@@ -25,8 +47,12 @@ export default function LoginScreen({ onSignUp = () => { }, onLoginSuccess = () 
         </div>
         <h1 className="title">Welcome</h1>
         <p className="subtitle">Log in to your account</p>
-        <input className="input" placeholder="Email" />
-        <input className="input" type="password" placeholder="Password" />
+        <input className="input" placeholder="Email" value={email} onChange={ (e) => setEmail(e.target.value) }/>
+        <div className="error-message">{validationState.email != "valid" ? validationState.email : ""}</div>
+
+        <input className="input" type="password" placeholder="Password" value={password} onChange={ (e) => setPassword(e.target.value) }/>
+        <div className="error-message">{validationState.password != "valid" ? validationState.password : ""}</div>
+
 
         <button className="cta" onClick={handleLogin} style={{ marginTop: 18 }}>{
           loginCall.state === "pending" ?

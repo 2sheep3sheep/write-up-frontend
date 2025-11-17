@@ -6,11 +6,13 @@ export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = 
   const [isAuthor, setIsAuthor] = useState(false);
   const [registerCall, setRegisterCall] = useState({ state: "inactive" });
 
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const [validationState, setValidationState] = useState(
     {
+      username:"valid",
       email:"valid",
       password:"valid"
     }
@@ -23,10 +25,16 @@ export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = 
     // temporary: simulate loading and success
     var isValid = true
     var newValidationState = {
+      username:"valid",
       email:"valid",
       password:"valid"
     }
+
+    if ( !username ) { isValid = false; newValidationState.username="A username is required"; }
+    if ( !email ) { isValid = false; newValidationState.email="An email is required"; }
+
     if ( !password_re.test(password) ) { isValid=false; newValidationState.password="Password must be at least 10 characters long and include an uppercase letter, a lowercase letter, a number, and a special character. Spaces are not allowed. (dev: abcdefghijkL+1)" }
+    if ( !password ) { isValid = false; newValidationState.password="A password is required"; }
 
     setValidationState(newValidationState)
 
@@ -50,9 +58,12 @@ export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = 
         <h1 className="title">Welcome</h1>
         <p className="subtitle">Sign up to get started</p>
 
-        <input className="input" placeholder="Username"/>
+        <input className="input" placeholder="Username" value={username} onChange={ (e) => setUsername(e.target.value) }/>
+        <div className="error-message">{validationState.username != "valid" ? validationState.username : ""}</div>
+
         <input className="input" placeholder="Email" value={email} onChange={ (e) => setEmail(e.target.value) }/>
         <div className="error-message">{validationState.email != "valid" ? validationState.email : ""}</div>
+
         <input className="input" type="password" placeholder="Password" value={password} onChange={ (e) => setPassword(e.target.value) }/>
         <div className="error-message">{validationState.password != "valid" ? validationState.password : ""}</div>
 
