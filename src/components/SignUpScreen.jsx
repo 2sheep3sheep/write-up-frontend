@@ -72,7 +72,7 @@ export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = 
           <div style={{ color: '#fff' }}>I want to be an author</div>
         </div>
 
-        {isAuthor && (
+        {/*isAuthor && (
           <>
             <div className="small-label">Author biography</div>
             <textarea className="input textarea" placeholder="Short biography (min 20 characters)" />
@@ -81,7 +81,7 @@ export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = 
             <input className="input" placeholder="e.g. Fantasy, Sci-fi, Drama" />
             <div className="note">Separate multiple genres with commas. At least one genre is recommended.</div>
           </>
-        )}
+        )*/}
 
         <button className="cta" onClick={handleRegister} style={{ marginTop: 18 }}>{
           registerCall.state === "pending" ?
