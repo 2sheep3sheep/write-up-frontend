@@ -1,0 +1,45 @@
+.book-detail-root {
+  padding: 20px;
+  color: white;
+}
+
+.book-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+}
+
+.book-desc {
+  opacity: 0.8;
+  margin-bottom: 16px;
+}
+
+.chapter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.add-btn {
+  background: #4da3ff;
+  color: #092033;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.chapter-list {
+  margin-top: 16px;
+}
+
+.chapter-item {
+  background: rgba(255,255,255,0.04);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.empty-chapters {
+  opacity: 0.6;
+}

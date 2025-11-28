@@ -1,126 +1,94 @@
-// src/App.jsx
-import React, { useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import WelcomeScreen from './components/WelcomeScreen';
-import SignUpScreen from './components/SignUpScreen';
-import LoginScreen from './components/LoginScreen';
-import HomeScreen from './components/HomeScreen';
-import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
 
-const pageVariants = {
-  initial: direction => ({
-    opacity: 0,
-    x: direction > 0 ? 50 : -50,   // slide from right for forward, left for back
-    scale: 0.99,
-  }),
-  animate: {
-    opacity: 1,
-    x: 0,
-    scale: 1,
-    transition: { duration: 0.36, ease: [0.2, 0.8, 0.2, 1] },
-  },
-  exit: direction => ({
-    opacity: 0,
-    x: direction < 0 ? 50 : -50,   // slide out opposite direction
-    scale: 0.99,
-    transition: { duration: 0.28, ease: [0.2, 0.8, 0.2, 1] },
-  }),
-};
+import WelcomeScreen from "./components/WelcomeScreen";
+import SignUpScreen from "./components/SignUpScreen";
+import LoginScreen from "./components/LoginScreen";
+import HomeScreen from "./components/HomeScreen";
+import MyBooks from "./components/MyBooks";
+import ProfileScreen from "./components/ProfileScreen";
+import BookDetail from "./components/BookDetail";
 
 export default function App() {
-  const [screen, setScreen] = useState('welcome'); // welcome | signup | login | home
-  // direction: +1 moving forward, -1 moving back (controls slide direction)
-  const [direction, setDirection] = useState(1);
+  const navigate = useNavigate();
 
-  function goTo(next) {
-    // simple heuristic: welcome <-> signup <-> login <-> home ordering
-    const order = { welcome: 0, signup: 1, login: 2, home: 3 };
-    setDirection(order[next] >= order[screen] ? 1 : -1);
-    setScreen(next);
-  }
+  const [books, setBooks] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("mybooks") || "[]");
+    } catch {
+      return [];
+    }
+  });
 
-  const navTo = useNavigate();
+  useEffect(() => {
+    localStorage.setItem("mybooks", JSON.stringify(books));
+  }, [books]);
 
-  // URI-based route switching
+  const handleCreateBook = (newBook) => {
+  const book = {
+    id: newBook.id ?? Date.now().toString(),
+    title: newBook.title,
+    description: newBook.description || "",
+    chapters: Array.isArray(newBook.chapters)
+      ? newBook.chapters.map(t => (typeof t === "string" ? { title: t, content: "" } : t))
+      : [],
+    lastEdited: newBook.lastEdited ?? new Date().toISOString(),
+  };
+
+  // додаємо до стану додатка (якщо у тебе є setBooks)
+  setBooks(prev => {
+    const next = [book, ...(prev || [])];
+    try { localStorage.setItem("mybooks", JSON.stringify(next)); } catch (e) { console.warn(e); }
+    return next;
+  });
+};
+
   return (
-    <div style={{ position: "relative", width: "100%", height: "100%", overflowX: "hidden" }}>
-      <Routes>
-        <Route path="/" element={<WelcomeScreen onGetStarted={() => navTo('/signup')} onLogin={() => navTo('/login')} />} />
-        <Route path="/login" element={<LoginScreen onSignUp={() => navTo('signup')} onLoginSuccess={() => navTo('home')} />} />
-        <Route path="/signup" element={<SignUpScreen onLogin={() => navTo('login')} onRegisterSuccess={() => navTo('home')} />} />
-        <Route path="/home" element={<HomeScreen setScreen={navTo} />} />
-      </Routes>
-    </div>
-  );
-  /*
-    Additional routes
-    /profile (with user ID query)
-    /book    (with book ID query)
-    /chapter (with book ID and chapter ID query)
-    ...
-  */
+    <Routes>
+      <Route path="/" element={
+        <WelcomeScreen
+          onGetStarted={() => navigate("/signup")}
+          onLogin={() => navigate("/login")}
+        />
+      } />
 
+      <Route path="/signup" element={
+        <SignUpScreen
+          onLogin={() => navigate("/login")}
+          onRegisterSuccess={() => navigate("/home")}
+        />
+      } />
 
-  // Previous state-based route switching, with animations
-  return (
-    <div style={{ position: "relative", width: "100%", height: "100%", overflowX: "hidden" }}>
-      <AnimatePresence mode="wait" initial={false}>
-        {screen === 'welcome' && (
-          <motion.div
-            key="welcome"
-            custom={direction}
-            variants={pageVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            style={{ width: '100%' }}
-          >
-            <WelcomeScreen onGetStarted={() => goTo('signup')} onLogin={() => goTo('login')} />
-          </motion.div>
-        )}
+      <Route path="/login" element={
+        <LoginScreen
+          onSignUp={() => navigate("/signup")}
+          onLoginSuccess={() => navigate("/home")}
+        />
+      } />
 
-        {screen === 'signup' && (
-          <motion.div
-            key="signup"
-            custom={direction}
-            variants={pageVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            style={{ width: '100%' }}
-          >
-            <SignUpScreen onLogin={() => goTo('login')} onRegisterSuccess={() => goTo('home')} />
-          </motion.div>
-        )}
+      <Route path="/home" element={
+        <HomeScreen
+          setScreen={navigate}
+          onCreateBook={handleCreateBook}
+          onViewMyBooks={() => navigate("/mybooks")}
+          books={books}
+          setBooks={setBooks}
+        />
+      } />
 
-        {screen === 'login' && (
-          <motion.div
-            key="login"
-            custom={direction}
-            variants={pageVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            style={{ width: '100%' }}
-          >
-            <LoginScreen onSignUp={() => goTo('signup')} onLoginSuccess={() => goTo('home')} />
-          </motion.div>
-        )}
+      <Route path="/mybooks" element={
+        <MyBooks
+          books={books}
+          setBooks={setBooks}
+          onViewBook={(id) => navigate(`/book/${id}`)}
+        />
+      } />
 
-        {screen === 'home' && (
-          <motion.div
-            key="home"
-            custom={direction}
-            variants={pageVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            style={{ width: '100%' }}
-          >
-            <HomeScreen setScreen={setScreen} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+      <Route path="/book/:id" element={
+        <BookDetail books={books} setBooks={setBooks} />
+      } />
+
+      <Route path="/profile" element={<ProfileScreen setScreen={navigate} />} />
+    </Routes>
   );
 }
