@@ -53,7 +53,7 @@ function CreateBookScreen({ pathname, setScreen }) {
                 <h1 className="page-title">My Books (placeholder)</h1>
             </div>
 
-            <div style={{ minHeight: '100vh', padding: 20 }}>
+            <div style={{ minHeight: '112vh' }}>
 
                 <div style={{ display: 'flex', justifyContent: 'center', marginTop: 18 }}>
                     {bookListCall.state === "pending" ? <ClipLoader color="var(--color-white)" size={30} /> : "There are no books yet."}

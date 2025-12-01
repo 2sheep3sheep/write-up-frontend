@@ -16,7 +16,7 @@ function ProfileScreen({ pathname, setScreen }) {
     const authorName = "J. K. Rowling";
     const genres = ["Fantasy", "Drama", "Fiction"];
     const email = "j.k.rowling@gmail.com";
-    const bio = "J. K. Rowling, is the British novelist who wrote Harry Potter, a seven-volume series about a young wizard. \
+    const bio = "J. K. Rowling is the British novelist who wrote Harry Potter, a seven-volume series about a young wizard. \
     Published from 1997 to 2007, the fantasy novels are the best-selling book series in history, with over 600 million copies sold."
 
     const loadProfile = () => {
@@ -67,7 +67,7 @@ function ProfileScreen({ pathname, setScreen }) {
                 <h1 className="page-title">Author's profile</h1>
             </div>
 
-            <div style={{ minHeight: '100vh' }}>
+            <div style={{ minHeight: '112vh' }}>
                 <div style={{ position: "absolute", left: "10%", right: "10%" }}>
                     {profileCall.state === "pending" ? <div style={{ display: "flex", justifyContent: "center" }}>
                         <ClipLoader color="var(--color-white)" size={30} />

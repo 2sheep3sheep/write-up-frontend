@@ -54,7 +54,7 @@ function HomeScreen({ pathname, setScreen }) {
                 <h1 className="page-title">Home (placeholder)</h1>
             </div>
 
-            <div style={{ minHeight: '100vh', padding: 20 }}>
+            <div style={{ minHeight: '112vh' }}>
 
                 <p style={{ textAlign: 'center' }}>You are logged in (mock). Next: build MyBooks screen.</p>
 
