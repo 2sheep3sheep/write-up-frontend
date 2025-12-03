@@ -133,7 +133,7 @@ export default function App() {
                 style={{ width: '100%' }}
               >
 
-                <SignUpScreen onLogin={() => navTo('login', -1)} onRegisterSuccess={() => navTo('home', 1)} />
+                <SignUpScreen onLogin={() => navTo('login', -1)} onRegisterSuccess={() => navTo('login', 1)} />
               </motion.div>
             } />
 
