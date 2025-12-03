@@ -1,6 +1,7 @@
 import { React, useState } from 'react';
 import LogoCard from './LogoCard';
 import { ClipLoader } from "react-spinners";
+import FetchHelper from '../fetchHelper';
 
 export default function LoginScreen({ onSignUp = () => { }, onLoginSuccess = () => { } }) {
   const [loginCall, setLoginCall] = useState({ state: "inactive" });
@@ -11,17 +12,19 @@ export default function LoginScreen({ onSignUp = () => { }, onLoginSuccess = () 
   const [validationState, setValidationState] = useState(
     {
       email:"valid",
-      password:"valid"
+      password:"valid",
+      overall:"valid"
     }
   );
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     // TODO: when backend ready -> fetch('/auth/login', {method:'POST', body: JSON.stringify({email,password})})
     // temporary: simulate loading and success
     var isValid = true
     var newValidationState = {
       email:"valid",
-      password:"valid"
+      password:"valid",
+      overall:"valid"
     }
 
     if ( !password ) { isValid = false; newValidationState.password="Please enter your password"; }
@@ -30,12 +33,25 @@ export default function LoginScreen({ onSignUp = () => { }, onLoginSuccess = () 
     setValidationState(newValidationState);
 
     if (isValid) {
-      setLoginCall({ state: "pending" });
-
-      setTimeout(() => {
-        setLoginCall({ state: "success" });
-        onLoginSuccess();
-      }, 2000);
+      // Call backend to log in user
+      const result = await FetchHelper.user.login(
+        {
+          email: email,
+          password: password
+        }
+      )
+      // If request is succesful
+      if ( result.ok ) {
+        const response = result.response;
+        // Response is succesful, handle response data
+        if (response.token) {
+            localStorage.setItem("token", response.token)
+            console.log(response.token)
+            onLoginSuccess();
+        }else{
+          newValidationState.overall = response.message ?? "Something went wrong...";
+        }
+      }
     }
   }
 
@@ -59,6 +75,8 @@ export default function LoginScreen({ onSignUp = () => { }, onLoginSuccess = () 
             <ClipLoader color="white" size={20} /> : "Log in"
         }
         </button>
+        <div className="error-message">{validationState.overall != "valid" ? validationState.overall : ""}</div>
+
 
         <button className="link" onClick={onSignUp}>Don’t have an account? Sign up</button>
       </div>
