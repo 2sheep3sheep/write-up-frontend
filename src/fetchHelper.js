@@ -53,6 +53,13 @@ const FetchHelper = {
         create : async (dtoIn) => Call(baseUri, "books", dtoIn, "post"),
         edit : async (dtoIn, bookId) => Call(baseUri, `books/${bookId}`, dtoIn, "patch"),
         delete : async (dtoIn, bookId) => Call(baseUri, `books/${bookId}`, dtoIn, "delete"),
+        
+        chapters: {
+            create : async (dtoIn, bookId) => Call(baseUri, `books/${bookId}/chapters`, dtoIn, "post"),
+            get : async (dtoIn, bookId, chapterId) => Call(baseUri, `books/${bookId}/chapters/${chapterId}`, dtoIn, "get"),
+            edit : async (dtoIn, bookId, chapterId) => Call(baseUri, `books/${bookId}/chapters/${chapterId}`, dtoIn, "patch"),
+            delete : async (dtoIn, bookId, chapterId) => Call(baseUri, `books/${bookId}/chapters/${chapterId}`, dtoIn, "delete"),
+        }
     }
 }
 
