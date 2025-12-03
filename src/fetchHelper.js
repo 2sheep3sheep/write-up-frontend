@@ -45,6 +45,14 @@ const FetchHelper = {
         token: {
             login: async (dtoIn) => Call(baseUri, "user/token/login", dtoIn, "post"),
         }
+    },
+    // The way the fetch helper is organised doesnt work as well for the /books requests, since they are the same route, but different request types,
+    // for ease of use, the methods are named after their function, rather than the actual called request
+    books : {
+        get : async (dtoIn, bookId) => Call(baseUri, `books/${bookId}`, dtoIn, "get"),
+        create : async (dtoIn) => Call(baseUri, "books", dtoIn, "post"),
+        edit : async (dtoIn, bookId) => Call(baseUri, `books/${bookId}`, dtoIn, "patch"),
+        delete : async (dtoIn, bookId) => Call(baseUri, `books/${bookId}`, dtoIn, "delete"),
     }
 }
 
