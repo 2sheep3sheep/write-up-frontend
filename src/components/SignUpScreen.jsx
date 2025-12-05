@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import LogoCard from './LogoCard';
 import { ClipLoader } from "react-spinners";
+import FetchHelper from '../fetchHelper';
 
 export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = () => { } }) {
   const [isAuthor, setIsAuthor] = useState(false);
@@ -14,20 +15,22 @@ export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = 
     {
       username:"valid",
       email:"valid",
-      password:"valid"
+      password:"valid",
+      overall:"valid"
     }
   );
 
   const password_re = new RegExp("^(?=.{10,}$)(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\sA-Za-z0-9])(?!.*\s).*$");
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     // TODO: when backend ready -> fetch('/auth/login', {method:'POST', body: JSON.stringify({email,password})})
     // temporary: simulate loading and success
     var isValid = true
     var newValidationState = {
       username:"valid",
       email:"valid",
-      password:"valid"
+      password:"valid",
+      overall:"valid"
     }
 
     if ( !username ) { isValid = false; newValidationState.username="A username is required"; }
@@ -36,18 +39,40 @@ export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = 
     if ( !password_re.test(password) ) { isValid=false; newValidationState.password="Password must be at least 10 characters long and include an uppercase letter, a lowercase letter, a number, and a special character. Spaces are not allowed. (dev: abcdefghijkL+1)" }
     if ( !password ) { isValid = false; newValidationState.password="A password is required"; }
 
-    setValidationState(newValidationState)
-
+    
     if (isValid) {
-        setRegisterCall({ state: "pending" });
+        // Call backend to register user
+        const result = await FetchHelper.user.register(
+          {
+            username: username,
+            email: email,
+            password: password
+          }
+        )
+        // If request is succesful
+        if ( result.ok ) {
+          const response = result.response;
+          // Response is succesful, handle response data
+          if (response.status === "success") {
+              // Registration was successful, prompt the user to log in,
+              // we could automatically log in the user right here, although in the case there is a problem with the logging in, it might
+              // cause problems later
+              //
+              // Besides, the backend doesnt send responses yet, so we can do that once thats fixed
+              onRegisterSuccess();
+          }
+          // Error, display response error
+          if (response.status === "error") {
+            newValidationState.overall = response.message;
+          }
 
-        setTimeout(() => {
-          setRegisterCall({ state: "success" });
-          onRegisterSuccess();
-        }, 2000);
+        }else{
+          newValidationState.overall = "Something went wrong...";
+        }
     }else{
-        setValidationState(newValidationState)
+        //invalid
     }
+    setValidationState(newValidationState)
   }
 
   return (
@@ -88,6 +113,7 @@ export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = 
             <ClipLoader color="white" size={20} /> : "Sign up"
         }
         </button>
+        <div className="error-message">{validationState.overall != "valid" ? validationState.overall : ""}</div>
 
         <button style={{ marginBottom: 50 }} className="link" onClick={onLogin}>Already have an account? Log in</button>
       </div>

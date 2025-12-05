@@ -55,6 +55,17 @@ export default function HomeScreen({
       console.error(err);
       setError("Failed to load books. Try again.");
       setBookListCall({ state: "error" });
+
+function HomeScreen({ pathname, setScreen }) {
+    const [bookListCall, setBookListCall] = useState({ state: "inactive" });
+    const [logoutCall, setLogoutCall] = useState({ state: "inactive" });
+
+    const loadBooks = () => {
+        setBookListCall({ state: "pending" });
+
+        setTimeout(() => {
+            setBookListCall({ state: "success" });
+        }, 2000);
     }
   };
 
