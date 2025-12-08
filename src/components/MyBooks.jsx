@@ -5,7 +5,7 @@ import CreateBookModal from "./CreateBookModal";
 import BookModal from "./BookModal";
 import "../styles/mybooks.css";
 
-export default function MyBooks({ books = [], setBooks = () => {}, setScreen = () => {} }) {
+export default function MyBooks({ books = [], setBooks = () => { }, setScreen = () => { } }) {
   const [list, setList] = useState(() => {
     try {
       const fromLocal = JSON.parse(localStorage.getItem("mybooks") || "[]");
@@ -70,7 +70,7 @@ export default function MyBooks({ books = [], setBooks = () => {}, setScreen = (
   // --- NEW: delete handler ---
   const handleDelete = (id) => {
     const book = list.find(b => b.id === id);
-    const ok = window.confirm(`Видалити книгу "${book?.title ?? 'Без назви'}"? Це незворотно.`);
+    const ok = window.confirm(`Delete book "${book?.title ?? 'Untitled'}"? This is irreversible.`);
     if (!ok) return;
 
     setList(prev => {
