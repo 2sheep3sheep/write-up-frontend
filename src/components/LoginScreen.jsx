@@ -3,7 +3,7 @@ import LogoCard from './LogoCard';
 import { ClipLoader } from "react-spinners";
 import FetchHelper from '../fetchHelper';
 
-export default function LoginScreen({ onSignUp = () => { }, onLoginSuccess = () => { } }) {
+export default function LoginScreen({ onSignUp = () => { }, onLoginSuccess = () => { }, loginLocal }) {
   const [loginCall, setLoginCall] = useState({ state: "inactive" });
 
   const [email, setEmail] = useState("");
@@ -46,11 +46,7 @@ export default function LoginScreen({ onSignUp = () => { }, onLoginSuccess = () 
         const response = result.response;
         // Response is succesful, handle response data
         if (response.accessToken) {
-            localStorage.setItem("accessToken", response.accessToken)
-            localStorage.setItem("username", response.username)
-            localStorage.setItem("email", response.email)
-            localStorage.setItem("userId", response.userId)
-            localStorage.setItem("authorId", response.authorId)
+            loginLocal(response)
             onLoginSuccess();
         }else{
           newValidationState.overall = response.message ?? "Something went wrong...";

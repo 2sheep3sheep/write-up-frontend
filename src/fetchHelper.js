@@ -1,16 +1,15 @@
-const accessToken = localStorage.getItem("accessToken")
-const refreshToken = localStorage.getItem("refreshToken")
 
-async function Call(baseUri, useCase, dtoIn, method) {
+
+async function Call(baseUri, useCase, dtoIn, method, token = undefined) {
 
     let response;
 
     try {
         if (!method || method === "get") {
             if (dtoIn) {
-                response = await fetch(`${baseUri}/${useCase}?${new URLSearchParams(dtoIn)}`, { headers: { "Authorization": `Bearer ${accessToken}` } }  )
+                response = await fetch(`${baseUri}/${useCase}?${new URLSearchParams(dtoIn)}`, { headers: { "Authorization": `Bearer ${token ?? localStorage.getItem("accessToken")}` } }  )
             } else {
-                response = await fetch(`${baseUri}/${useCase}`, { headers: { "Authorization": `Bearer ${accessToken}` } } )
+                response = await fetch(`${baseUri}/${useCase}`, { headers: { "Authorization": `Bearer ${token ?? localStorage.getItem("accessToken")}` } } )
             }
         } else {
             response = await fetch(`${baseUri}/${useCase}`,
@@ -18,7 +17,7 @@ async function Call(baseUri, useCase, dtoIn, method) {
                     method: method.toUpperCase(),
                     headers: { 
                         "Content-Type":"application/json",
-                        "Authorization": `Bearer ${accessToken}`
+                        "Authorization": `Bearer ${token ?? localStorage.getItem("accessToken")}`
                     },
                     body: JSON.stringify(dtoIn)
                 }
@@ -43,6 +42,7 @@ const FetchHelper = {
     user : {
         register: async (dtoIn) => Call(baseUri, "user/register", dtoIn, "post"),
         login: async (dtoIn) => Call(baseUri, "user/token/login", dtoIn, "post"),
+        refresh: async (dtoIn, token) => Call(baseUri, "user/token/refresh", dtoIn, "get", token),
     },
     // The way the fetch helper is organised doesnt work as well for the /books requests, since they are the same route, but different request types,
     // for ease of use, the methods are named after their function, rather than the actual called request
@@ -59,6 +59,9 @@ const FetchHelper = {
             edit : async (dtoIn, bookId, chapterId) => Call(baseUri, `books/${bookId}/chapters/${chapterId}`, dtoIn, "patch"),
             delete : async (dtoIn, bookId, chapterId) => Call(baseUri, `books/${bookId}/chapters/${chapterId}`, dtoIn, "delete"),
         }
+    },
+    profile : {
+            create : async (dtoIn, token) => Call(baseUri, `profile`, dtoIn, "post", token),
     }
 }
 

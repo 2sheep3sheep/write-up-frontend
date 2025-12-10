@@ -133,7 +133,16 @@ export default function App() {
     console.log(response)
   }
 
-  const removeLocalSessionData = () => {
+  const loginLocal = async (response) => {
+      localStorage.setItem("accessToken", response.accessToken)
+      localStorage.setItem("refreshToken", response.refreshToken)
+      localStorage.setItem("username", response.username)
+      localStorage.setItem("email", response.email)
+      localStorage.setItem("userId", response.userId)
+      localStorage.setItem("authorId", response.authorId)
+  }
+
+  const removeLocalSessionData = async () => {
     localStorage.removeItem("accessToken")
     localStorage.removeItem("refreshToken")
   }
@@ -166,7 +175,7 @@ export default function App() {
                 style={{ width: '100%' }}
               >
 
-                <LoginScreen onSignUp={() => navTo('signup', 1)} onLoginSuccess={() => navTo('home', 1)} />
+                <LoginScreen onSignUp={() => navTo('signup', 1)} onLoginSuccess={() => navTo('home', 1)} loginLocal={loginLocal} />
               </motion.div>
             } />
 
@@ -179,7 +188,7 @@ export default function App() {
       
                 style={{ width: '100%' }}
               >
-                <SignUpScreen onLogin={() => navTo('login', -1)} onRegisterSuccess={() => navTo('login', 1)} />
+                <SignUpScreen onLogin={() => navTo('login', -1)} onRegisterSuccess={() => navTo('home', 1)} loginLocal={loginLocal}  />
               </motion.div>
             } />
 
@@ -229,8 +238,17 @@ export default function App() {
               </motion.div>
             } />
 
-
-        <Route path="/mybooks" element={<MyBooks books={books} setBooks={setBooks} onViewBook={(id) => navTo(`/book/${id}`)} />} />
+        <Route path="/mybooks"
+          element={
+            <motion.div
+              animate={animationStateController()}
+              onAnimationComplete={() => handleAnimationFinish()}
+    
+              style={{ width: '100%' }}
+            >
+              <MyBooks books={books} setBooks={setBooks} onViewBook={(id) => navTo(`/book/${id}`)} />
+            </motion.div>
+          } />
 
         <Route path="/book/:id" element={<BookDetail books={books} setBooks={setBooks} />} />
 

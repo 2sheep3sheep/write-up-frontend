@@ -3,7 +3,7 @@ import LogoCard from './LogoCard';
 import { ClipLoader } from "react-spinners";
 import FetchHelper from '../fetchHelper';
 
-export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = () => { } }) {
+export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = () => { }, loginLocal }) {
   const [isAuthor, setIsAuthor] = useState(false);
   const [registerCall, setRegisterCall] = useState({ state: "inactive" });
 
@@ -49,18 +49,58 @@ export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = 
             password: password
           }
         )
-        console.log( result )
         // If request is succesful
         if ( result.ok ) {
           const response = result.response;
           // Response is succesful, handle response data
           if (response.status === "success") {
-              // Registration was successful, prompt the user to log in,
-              // we could automatically log in the user right here, although in the case there is a problem with the logging in, it might
-              // cause problems later
-              //
-              // Besides, the backend doesnt send responses yet, so we can do that once thats fixed
-              onRegisterSuccess();
+             
+              if (!isAuthor) {
+                // Not an author, try logging in and navigate to home page
+                const loginResult = await FetchHelper.user.login({
+                  email: email,
+                  password: password
+                })
+                
+                console.log(loginResult)
+                if (loginResult.response.status === "error"){
+                  newValidationState.overall = response.message;
+                }else{
+                  await loginLocal(loginResult.response)
+                  onRegisterSuccess();
+                }
+              } else {
+                // Wants to be an author, log in, create author profile, and refresh access token
+                const loginResult = await FetchHelper.user.login({
+                  email: email,
+                  password: password
+                })
+                const loginResponse = loginResult.response;
+                // Logged user in, try creating profile
+                if (!loginResult.ok) {
+
+                  newValidationState.overall = loginResponse.message;
+
+                }else{
+                  await loginLocal(loginResponse)
+                  // Create profile with logged in information, token must be passed in directly, instead of fetching localStorage, due to a delay
+                  const createProfileResult = await FetchHelper.profile.create({
+                        user_id: loginResponse.userId,
+                        email: loginResponse.email,
+                        username: loginResponse.username
+                  },loginResponse.accessToken)
+
+                  if (createProfileResult.ok) {
+                    // Created profile, refresh user token in the localStorage, and then move to home page
+                    const refreshTokenResult = await FetchHelper.user.refresh({}, loginResponse.refreshToken)
+                    console.log(refreshTokenResult)
+                    if (refreshTokenResult.ok) {
+                      localStorage.setItem("accessToken",refreshTokenResult.response.accessToken)
+                      onRegisterSuccess()
+                    }
+                  }
+                }
+              }
           }
           // Error, display response error
           if (response.status === "error") {
