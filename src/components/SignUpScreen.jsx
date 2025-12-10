@@ -49,6 +49,7 @@ export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = 
             password: password
           }
         )
+        console.log( result )
         // If request is succesful
         if ( result.ok ) {
           const response = result.response;

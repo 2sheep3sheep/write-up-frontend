@@ -77,7 +77,7 @@ export default function HomeScreen({
           <BackArrow onClick={() => setScreen && setScreen("/")} />
         </div>
         <div className="header-center">
-          <h1 className="home-title">Welcome back, {username}</h1>
+          <h1 className="home-title">Welcome back, {localStorage.getItem("username")}</h1>
           <p className="home-sub">Continue your writing journey</p>
         </div>
         <div className="header-right">
@@ -164,7 +164,6 @@ export default function HomeScreen({
         onClose={() => setCreateOpen(false)}
         onCreate={(newBook) => {
           if (onCreateBook) onCreateBook(newBook);
-          setRecentBooks(prev => [{ id: new Date().toISOString(), ...newBook, lastEdited: new Date().toISOString() }, ...prev]);
           setCreateOpen(false);
         }}
       />

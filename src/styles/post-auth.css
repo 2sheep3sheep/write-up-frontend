@@ -107,3 +107,24 @@ body {
         border-bottom-left-radius: 0;
     }
 }
+
+.back-arrow {
+  background: white;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  color: var(--accent);
+  cursor: pointer;
+  align-items: center;
+  display: flex;
+  width: 95px;
+  padding: 8px 10px;
+  position: relative;
+  left:26px;
+}
+
+.back-arrow-inner {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 13px;
+}

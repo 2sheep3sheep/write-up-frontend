@@ -1,4 +1,5 @@
-const token = localStorage.getItem("token")
+const accessToken = localStorage.getItem("accessToken")
+const refreshToken = localStorage.getItem("refreshToken")
 
 async function Call(baseUri, useCase, dtoIn, method) {
 
@@ -7,18 +8,17 @@ async function Call(baseUri, useCase, dtoIn, method) {
     try {
         if (!method || method === "get") {
             if (dtoIn) {
-                response = await fetch(`${baseUri}/${useCase}?${new URLSearchParams(dtoIn)}`, { headers: { "Authorization": `Bearer ${token}` } }  )
+                response = await fetch(`${baseUri}/${useCase}?${new URLSearchParams(dtoIn)}`, { headers: { "Authorization": `Bearer ${accessToken}` } }  )
             } else {
-                response = await fetch(`${baseUri}/${useCase}`, { headers: { "Authorization": `Bearer ${token}` } } )
+                response = await fetch(`${baseUri}/${useCase}`, { headers: { "Authorization": `Bearer ${accessToken}` } } )
             }
         } else {
-            console.log( dtoIn )
             response = await fetch(`${baseUri}/${useCase}`,
                 {
                     method: method.toUpperCase(),
                     headers: { 
                         "Content-Type":"application/json",
-                        "Authorization": `Bearer ${token}`
+                        "Authorization": `Bearer ${accessToken}`
                     },
                     body: JSON.stringify(dtoIn)
                 }
@@ -47,6 +47,7 @@ const FetchHelper = {
     // The way the fetch helper is organised doesnt work as well for the /books requests, since they are the same route, but different request types,
     // for ease of use, the methods are named after their function, rather than the actual called request
     books : {
+        list : async (dtoIn) => Call(baseUri, `books`, dtoIn, "get"),
         get : async (dtoIn, bookId) => Call(baseUri, `books/${bookId}`, dtoIn, "get"),
         create : async (dtoIn) => Call(baseUri, "books", dtoIn, "post"),
         edit : async (dtoIn, bookId) => Call(baseUri, `books/${bookId}`, dtoIn, "patch"),

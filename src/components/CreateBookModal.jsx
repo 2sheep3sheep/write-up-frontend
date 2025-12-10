@@ -5,6 +5,7 @@ import "../styles/create-book-modal.css";
 export default function CreateBookModal({ open, onClose = () => {}, onCreate = () => {} }) {
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
+  const [genre, setGenre] = useState("");
   const [chapterTitle, setChapterTitle] = useState("");
   const [chapters, setChapters] = useState([]);
 
@@ -57,6 +58,7 @@ export default function CreateBookModal({ open, onClose = () => {}, onCreate = (
     // очистити локально
     setTitle("");
     setDesc("");
+    setGenre("");
     setChapters([]);
     setChapterTitle("");
     setEditingIndex(-1);
@@ -73,6 +75,9 @@ export default function CreateBookModal({ open, onClose = () => {}, onCreate = (
 
         <label className="cbm-label">Book Title</label>
         <input className="cbm-input" value={title} onChange={e => setTitle(e.target.value)} placeholder="Enter book title..." />
+
+        <label className="cbm-label">Genre</label>
+        <input className="cbm-input" value={genre} onChange={e => setGenre(e.target.value)} placeholder="What genre is your book?" />
 
         <label className="cbm-label">Description (optional)</label>
         <textarea className="cbm-textarea" value={desc} onChange={e => setDesc(e.target.value)} placeholder="What's your book about?" />

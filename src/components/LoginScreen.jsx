@@ -40,13 +40,17 @@ export default function LoginScreen({ onSignUp = () => { }, onLoginSuccess = () 
           password: password
         }
       )
+      console.log(result)
       // If request is succesful
       if ( result.ok ) {
         const response = result.response;
         // Response is succesful, handle response data
-        if (response.token) {
-            localStorage.setItem("token", response.token)
-            console.log(response.token)
+        if (response.accessToken) {
+            localStorage.setItem("accessToken", response.accessToken)
+            localStorage.setItem("username", response.username)
+            localStorage.setItem("email", response.email)
+            localStorage.setItem("userId", response.userId)
+            localStorage.setItem("authorId", response.authorId)
             onLoginSuccess();
         }else{
           newValidationState.overall = response.message ?? "Something went wrong...";

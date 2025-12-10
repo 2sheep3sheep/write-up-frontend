@@ -9,6 +9,7 @@ import CreateBookScreen from './components/CreateBookScreen';
 import ProfileScreen from './components/ProfileScreen';
 import BookDetail from "./components/BookDetail";
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
+import FetchHelper from "./fetchHelper";
 
 const pageVariants = {
 
@@ -105,7 +106,7 @@ export default function App() {
   }, [books]);
 
   // CREATE BOOK helper (отримує newBook від CreateBookModal)
-  const handleCreateBook = (newBook) => {
+  const handleCreateBookOLD = (newBook) => {
     const book = {
       id: newBook.id ?? Date.now().toString(),
       title: newBook.title || "Untitled",
@@ -122,6 +123,16 @@ export default function App() {
       return next;
     });
   };
+
+  const handleCreateBook = async (newBook) => {
+    const response = await FetchHelper.books.create({
+      name: newBook.title || "Untitled",
+      genre: newBook.genre || "No Genre",
+      description: newBook.description || ""
+    })
+    console.log(response)
+  }
+
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%", overflowX: "hidden" }}>
