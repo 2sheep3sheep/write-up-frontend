@@ -8,6 +8,7 @@ export default function BookModal({
   mode = "view", // "view" | "edit"
   onClose = () => { },
   onSave = () => { },
+  onViewChapter = () => { }
 }) {
   if (!open || !book) return null;
 
@@ -18,27 +19,33 @@ export default function BookModal({
     if (!b) {
       return {
         id: "",
-        title: "",
+        name: "",
         genre: "",
         description: "",
         chapters: [],
+        createdAt: null,
+        updatedAt: null
       };
     }
 
     return {
       id: b.id ?? "",
-      title: b.title ?? b.name ?? "",
-      name: b.name ?? b.title ?? "",
+      name: b.name ?? "",
       genre: b.genre ?? "",
       description: b.description ?? "",
       chapters: Array.isArray(b.chapters)
-        ? b.chapters.map((c, idx) => ({
-          id: c.id ?? `ch-${idx}-${Date.now()}`,
-          title: c.title ?? "",
+        ? b.chapters.map((c) => ({
+          id: c.id ?? Date.now(),
+          index: c.index ?? 1,
+          book_id: b.id ?? "",
+          name: c.name ?? "",
           content: c.content ?? "",
-          lastEdited: c.lastEdited ?? null,
+          createdAt: c.createdAt ?? null,
+          updatedAt: c.updatedAt ?? null
         }))
         : [],
+      createdAt: b.createdAt ?? null,
+      updatedAt: b.updatedAt ?? null
     };
   }
 
@@ -70,7 +77,7 @@ export default function BookModal({
   // ---------- handlers для EDIT ----------
   const handleTitleChange = (e) => {
     const value = e.target.value;
-    setDraft((prev) => ({ ...prev, title: value }));
+    setDraft((prev) => ({ ...prev, name: value }));
   };
 
   const handleGenreChange = (e) => {
@@ -88,7 +95,7 @@ export default function BookModal({
     setDraft((prev) => ({
       ...prev,
       chapters: prev.chapters.map((ch) =>
-        ch.id === chapterId ? { ...ch, title: value } : ch
+        ch.id === chapterId ? { ...ch, name: value, updatedAt: new Date().toISOString() } : ch
       ),
     }));
   };
@@ -98,26 +105,31 @@ export default function BookModal({
       ...prev,
       chapters: prev.chapters.map((ch) =>
         ch.id === chapterId
-          ? { ...ch, content: value, lastEdited: new Date().toISOString() }
+          ? { ...ch, content: value, updatedAt: new Date().toISOString() }
           : ch
       ),
     }));
   };
 
   const handleAddChapter = () => {
-    const id = `new-${Date.now()}`;
+    const id = Date.now().toString();
     setDraft((prev) => ({
       ...prev,
       chapters: [
         ...prev.chapters,
-        { id, title: "New chapter", content: "", lastEdited: null },
+        {
+          id: id, index: prev.chapters.length + 1, book_id: prev.id, name: "New chapter", content: "",
+          createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+        },
       ],
     }));
     setEditExpandedId(id);
   };
 
   const handleRemoveChapter = (chapterId) => {
-    const ok = window.confirm("Delete this chapter?");
+    const chapter = draft.chapters.find(chapter => chapter.id === chapterId);
+
+    const ok = window.confirm(`Delete chapter "${chapter.name}" ? This is irreversible.`);
     if (!ok) return;
 
     setDraft((prev) => ({
@@ -131,7 +143,7 @@ export default function BookModal({
   const handleSaveClick = () => {
     const updated = {
       ...draft,
-      name: draft.title,
+      name: draft.name,
       updatedAt: new Date().toISOString(),
     };
     onSave(updated);
@@ -155,13 +167,7 @@ export default function BookModal({
   //                      VIEW MODE
   // =========================================================
   if (isView) {
-    const rawChapters = Array.isArray(book.chapters) ? book.chapters : [];
-
-    // робимо стабільний _viewId, якщо у глави немає id
-    const chapters = rawChapters.map((c, idx) => ({
-      ...c,
-      _viewId: c.id ?? `view-${idx}`,
-    }));
+    const chapters = draft.chapters;
 
     return (
       <div className="bm-overlay">
@@ -193,7 +199,7 @@ export default function BookModal({
                 border: "1px solid rgba(255,255,255,0.04)",
               }}
             >
-              {book.title || <em>No title</em>}
+              {book.name || <em>No title</em>}
             </div>
           </div>
 
@@ -253,38 +259,23 @@ export default function BookModal({
           ) : (
             <div className="bm-chapters">
               {chapters.map((ch, idx) => {
-                const hasContent = !!ch.content;
-                const isExpanded = viewExpandedId === ch._viewId;
-
                 return (
-                  <div key={ch._viewId} className="bm-chapter">
+                  <div key={ch.id} className="bm-chapter">
                     <div className="bm-chapter-header">
                       <div className="bm-chapter-index">{idx + 1}</div>
                       <div className="bm-chapter-title">
-                        {ch.title || <em>Untitled chapter</em>}
+                        {ch.name || <em>Untitled chapter</em>}
                       </div>
-                    </div>
 
-                    {/* Текст ВЗАГАЛІ не видно, поки не expanded */}
-                    {hasContent && isExpanded && (
-                      <div className="bm-chapter-content">
-                        <p className="bm-pre">{ch.content}</p>
-                      </div>
-                    )}
-
-                    {hasContent && (
                       <button
                         className="bm-ghost"
-                        style={{ marginTop: 8, padding: "4px 10px" }}
-                        onClick={() =>
-                          setViewExpandedId((prev) =>
-                            prev === ch._viewId ? null : ch._viewId
-                          )
-                        }
+                        onClick={() => onViewChapter(ch.id)}
+                        style={{ padding: "6px 10px", minWidth: 105 }}
+                        type="button"
                       >
-                        {isExpanded ? "Hide text" : "Show text"}
+                        View chapter
                       </button>
-                    )}
+                    </div>
                   </div>
                 );
               })}
@@ -332,7 +323,7 @@ export default function BookModal({
           </div>
           <input
             className="bm-chapter-title-input"
-            value={draft.title}
+            value={draft.name}
             onChange={handleTitleChange}
             placeholder="Book title"
           />
@@ -396,7 +387,7 @@ export default function BookModal({
 
                     <input
                       className="bm-chapter-title-input"
-                      value={ch.title}
+                      value={ch.name}
                       onChange={(e) =>
                         handleChapterTitleChange(ch.id, e.target.value)
                       }

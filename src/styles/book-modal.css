@@ -61,7 +61,6 @@
   display: flex;
   gap: 10px;
   align-items: center;
-  margin-bottom: 8px;
 }
 
 .bm-chapter-index {
@@ -74,6 +73,7 @@
 .bm-chapter-title {
   font-weight: 700;
   color: #fff;
+  width: 77%;
 }
 
 .bm-chapter-title-input {
@@ -95,6 +95,7 @@
   background: rgba(255, 255, 255, 0.02);
   color: #e6eef0;
   border: 1px solid rgba(255, 255, 255, 0.03);
+  margin-top: 18px;
 }
 
 .bm-chapter-content {
@@ -117,7 +118,7 @@
   border: none;
   color: #ffb3b3;
   cursor: pointer;
-  margin-left: 8px;
+  margin-left: 3px;
 }
 
 .bm-actions {
@@ -138,6 +139,7 @@
 .bm-ghost {
   background: rgba(255, 255, 255, 0.03);
   color: #d8eef7;
+  min-width: 90px;
 }
 
 .bm-primary {

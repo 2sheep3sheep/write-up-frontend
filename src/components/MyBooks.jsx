@@ -5,7 +5,12 @@ import CreateBookModal from "./CreateBookModal";
 import BookModal from "./BookModal";
 import "../styles/mybooks.css";
 
-export default function MyBooks({ books = [], setBooks = () => { }, setScreen = () => { }, fetchBooks }) {
+export default function MyBooks({
+  books = [],
+  setBooks = () => { },
+  setScreen = () => { },
+  onViewChapter,
+  fetchBooks }) {
   const [list, setList] = useState(() => {
     try {
       const fromLocal = JSON.parse(localStorage.getItem("mybooks") || "[]");
@@ -50,12 +55,14 @@ export default function MyBooks({ books = [], setBooks = () => { }, setScreen = 
   const handleCreate = (newBook) => {
     const normalized = {
       ...newBook,
-      title: newBook.title ?? newBook.name,
-      name: newBook.name ?? newBook.title,
+      name: newBook.name,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       chapters: Array.isArray(newBook.chapters)
-        ? newBook.chapters.map(t => (typeof t === 'string' ? { title: t, content: "" } : t))
+        ? newBook.chapters.map(n => (typeof n === 'string' ? {
+          id: Date.now().toString(), name: n, content: "",
+          createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+        } : n))
         : [],
       id: newBook.id ?? Date.now().toString(),
     };
@@ -68,11 +75,13 @@ export default function MyBooks({ books = [], setBooks = () => { }, setScreen = 
     });
 
     setCreateOpen(false);
+
+    console.log(books)
   };
 
   const handleSave = (updated) => {
     setList(prev => {
-      const next = prev.map(b => (b.id === updated.id ? { ...updated, lastEdited: new Date().toISOString() } : b));
+      const next = prev.map(b => (b.id === updated.id ? { ...updated, updatedAt: new Date().toISOString() } : b));
       try { localStorage.setItem("mybooks", JSON.stringify(next)); } catch (e) { console.warn(e); }
       if (typeof setBooks === "function") setBooks(next);
       return next;
@@ -83,7 +92,7 @@ export default function MyBooks({ books = [], setBooks = () => { }, setScreen = 
   // --- NEW: delete handler ---
   const handleDelete = (id) => {
     const book = list.find(b => b.id === id);
-    const ok = window.confirm(`Delete book "${book?.title ?? book?.name ?? 'Untitled'}"? This is irreversible.`);
+    const ok = window.confirm(`Delete book "${book?.name ?? 'Untitled'}"? This is irreversible.`);
     if (!ok) return;
 
     setList(prev => {
@@ -132,7 +141,7 @@ export default function MyBooks({ books = [], setBooks = () => { }, setScreen = 
                   <button
                     className="btn btn-delete"
                     onClick={() => handleDelete(b.id)}
-                    aria-label={`Delete ${b.title}`}
+                    aria-label={`Delete ${b.name}`}
                     title="Delete book"
                   >
                     Delete
@@ -160,6 +169,7 @@ export default function MyBooks({ books = [], setBooks = () => { }, setScreen = 
         mode={modalMode}
         onClose={() => setOpenBook(null)}
         onSave={handleSave}
+        onViewChapter={onViewChapter}
       />
     </div>
   );

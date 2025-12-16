@@ -5,9 +5,8 @@ import SignUpScreen from './components/SignUpScreen';
 import LoginScreen from './components/LoginScreen';
 import HomeScreen from './components/HomeScreen';
 import MyBooks from "./components/MyBooks";
-import CreateBookScreen from './components/CreateBookScreen';
 import ProfileScreen from './components/ProfileScreen';
-import BookDetail from "./components/BookDetail";
+import Chapter from "./components/Chapter";
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import FetchHelper from "./fetchHelper";
 
@@ -37,15 +36,15 @@ const pageVariants = {
 };
 
 export default function App() {
-  
+
 
   // GLOBAL BOOK STATE (синхронізація з localStorage)
   const [books, setBooks] = useState([])
 
   const fetchBooks = async () => {
-      const fetchedBooks = await FetchHelper.books.list()
-      console.log(fetchedBooks.response)
-      return fetchedBooks.response
+    const fetchedBooks = await FetchHelper.books.list()
+    console.log(fetchedBooks.response)
+    return fetchedBooks.response
   }
 
 
@@ -69,7 +68,7 @@ export default function App() {
   const [nextPath, setNextPath] = useState("/")
 
   const navigateTo = useNavigate();
-  function navTo(to_URI, dir=1) {
+  function navTo(to_URI, dir = 1) {
     // While animating away, do not schedule another animation and page navigation
     if (animating) return;
 
@@ -138,12 +137,12 @@ export default function App() {
   }
 
   const loginLocal = async (response) => {
-      localStorage.setItem("accessToken", response.accessToken)
-      localStorage.setItem("refreshToken", response.refreshToken)
-      localStorage.setItem("username", response.username)
-      localStorage.setItem("email", response.email)
-      localStorage.setItem("userId", response.userId)
-      localStorage.setItem("authorId", response.authorId)
+    localStorage.setItem("accessToken", response.accessToken)
+    localStorage.setItem("refreshToken", response.refreshToken)
+    localStorage.setItem("username", response.username)
+    localStorage.setItem("email", response.email)
+    localStorage.setItem("userId", response.userId)
+    localStorage.setItem("authorId", response.authorId)
   }
 
   const removeLocalSessionData = async () => {
@@ -165,10 +164,21 @@ export default function App() {
 
                 style={{ width: '100%' }}
               >
-                <WelcomeScreen onGetStarted={() => navTo('/signup', 1)} onLogin={() => navTo('/login', 1)} navToInstantly={navigateTo}/>
+                <WelcomeScreen onGetStarted={() => navTo('/signup', 1)} onLogin={() => navTo('/login', 1)} navToInstantly={navigateTo} />
               </motion.div>
             } />
 
+          <Route path="/signup"
+            element={
+              <motion.div
+                animate={animationStateController()}
+                onAnimationComplete={() => handleAnimationFinish()}
+
+                style={{ width: '100%' }}
+              >
+                <SignUpScreen onLogin={() => navTo('login', -1)} onRegisterSuccess={() => navTo('home', 1)} loginLocal={loginLocal} />
+              </motion.div>
+            } />
 
           <Route path="/login"
             element={
@@ -183,19 +193,6 @@ export default function App() {
               </motion.div>
             } />
 
-
-          <Route path="/signup"
-            element={
-              <motion.div
-                animate={animationStateController()}
-                onAnimationComplete={() => handleAnimationFinish()}
-      
-                style={{ width: '100%' }}
-              >
-                <SignUpScreen onLogin={() => navTo('login', -1)} onRegisterSuccess={() => navTo('home', 1)} loginLocal={loginLocal}  />
-              </motion.div>
-            } />
-
           <Route path="/home"
             element={
               <motion.div
@@ -205,19 +202,19 @@ export default function App() {
                 style={{ width: '100%' }}
               >
 
-                <HomeScreen pathname={pathname} 
-                  setScreen={navTo} 
-                  onCreateBook={handleCreateBook} 
+                <HomeScreen pathname={pathname}
+                  setScreen={navTo}
+                  onCreateBook={handleCreateBook}
                   onViewMyBooks={() => navTo("mybooks", 1)}
                   books={books}
-                  setBooks={setBooks}  
+                  setBooks={setBooks}
                   fetchBooks={fetchBooks}
                   removeLocalSessionData={removeLocalSessionData}
-                  />
+                />
               </motion.div>
             } />
 
-          <Route path="/books"
+          <Route path="/mybooks"
             element={
               <motion.div
                 animate={animationStateController()}
@@ -225,14 +222,15 @@ export default function App() {
 
                 style={{ width: '100%' }}
               >
-
-                <CreateBookScreen pathname={pathname} setScreen={navTo} />
+                <MyBooks books={books} setBooks={setBooks} onViewChapter={(id) => navTo(`/chapter/${id}`, 1)} fetchBooks={fetchBooks} />
               </motion.div>
             } />
 
+          <Route path="/chapter/:id" element={<Chapter books={books} />} />
+
           <Route path="/profile"
             element={
-               <motion.div
+              <motion.div
                 animate={animationStateController()}
                 onAnimationComplete={() => handleAnimationFinish()}
 
@@ -242,20 +240,6 @@ export default function App() {
                 <ProfileScreen pathname={pathname} setScreen={navTo} />
               </motion.div>
             } />
-
-        <Route path="/mybooks"
-          element={
-            <motion.div
-              animate={animationStateController()}
-              onAnimationComplete={() => handleAnimationFinish()}
-    
-              style={{ width: '100%' }}
-            >
-              <MyBooks books={books} setBooks={setBooks} onViewBook={(id) => navTo(`/book/${id}`)} fetchBooks={fetchBooks}/>
-            </motion.div>
-          } />
-
-        <Route path="/book/:id" element={<BookDetail books={books} setBooks={setBooks} />} />
 
         </Routes>
       </AnimatePresence>
