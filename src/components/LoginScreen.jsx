@@ -11,9 +11,9 @@ export default function LoginScreen({ onSignUp = () => { }, onLoginSuccess = () 
 
   const [validationState, setValidationState] = useState(
     {
-      email:"valid",
-      password:"valid",
-      overall:"valid"
+      email: "valid",
+      password: "valid",
+      overall: "valid"
     }
   );
 
@@ -22,13 +22,13 @@ export default function LoginScreen({ onSignUp = () => { }, onLoginSuccess = () 
     // temporary: simulate loading and success
     var isValid = true
     var newValidationState = {
-      email:"valid",
-      password:"valid",
-      overall:"valid"
+      email: "valid",
+      password: "valid",
+      overall: "valid"
     }
 
-    if ( !password ) { isValid = false; newValidationState.password="Please enter your password"; }
-    if ( !email ) { isValid = false; newValidationState.email="Please enter your email"; }
+    if (!password) { isValid = false; newValidationState.password = "Please enter your password"; }
+    if (!email) { isValid = false; newValidationState.email = "Please enter your email"; }
 
     setValidationState(newValidationState);
 
@@ -41,14 +41,18 @@ export default function LoginScreen({ onSignUp = () => { }, onLoginSuccess = () 
         }
       )
       console.log(result)
+
       // If request is succesful
-      if ( result.ok ) {
+      if (result.ok) {
         const response = result.response;
         // Response is succesful, handle response data
         if (response.accessToken) {
-            loginLocal(response)
-            onLoginSuccess();
-        }else{
+          loginLocal(response)
+          onLoginSuccess();
+
+          // Pass the logged in user data into user context
+          setCurrentUser(result)
+        } else {
           newValidationState.overall = response.message ?? "Something went wrong...";
         }
       }
@@ -63,10 +67,10 @@ export default function LoginScreen({ onSignUp = () => { }, onLoginSuccess = () 
         </div>
         <h1 className="title">Welcome</h1>
         <p className="subtitle">Log in to your account</p>
-        <input className="input" placeholder="Email" value={email} onChange={ (e) => setEmail(e.target.value) }/>
+        <input className="input" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
         <div className="error-message">{validationState.email != "valid" ? validationState.email : ""}</div>
 
-        <input className="input" type="password" placeholder="Password" value={password} onChange={ (e) => setPassword(e.target.value) }/>
+        <input className="input" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
         <div className="error-message">{validationState.password != "valid" ? validationState.password : ""}</div>
 
 

@@ -16,9 +16,9 @@ export default function CreateBookModal({ open, onClose = () => { }, onCreate = 
   if (!open) return null;
 
   const addChapter = () => {
-    const t = chapterTitle.trim();
-    if (!t) return;
-    setChapters(prev => [...prev, t]);
+    const title = chapterTitle.trim();
+    if (!title) return;
+    setChapters(prev => [...prev, title]);
     setChapterTitle("");
   };
 
@@ -53,7 +53,7 @@ export default function CreateBookModal({ open, onClose = () => { }, onCreate = 
   };
 
   const handleCreate = () => {
-    const newBook = { name: title.trim(), description: desc.trim(), genre: genre.trim(), chapters };
+    const newBook = { id: Date.now().toString(), name: title.trim(), description: desc.trim(), genre: genre.trim(), chapters };
     onCreate(newBook);
     // очистити локально
     setTitle("");

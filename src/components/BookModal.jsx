@@ -36,7 +36,7 @@ export default function BookModal({
       chapters: Array.isArray(b.chapters)
         ? b.chapters.map((c) => ({
           id: c.id ?? Date.now(),
-          index: c.index ?? 1,
+          index: c.index ?? null,
           book_id: b.id ?? "",
           name: c.name ?? "",
           content: c.content ?? "",

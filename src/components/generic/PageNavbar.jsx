@@ -15,30 +15,32 @@ export default function PageNavbar(navTo) {
   };
 
   return (
-    <div className="page-navbar" role="navigation" aria-label="Bottom navigation">
-      <button
-        className={`nav-btn ${loc.pathname === "/home" ? "active" : ""}`}
-        onClick={() => nav("/home")}
-      >
-        <HomeIcon className="nav-icon" />
-        <div className="nav-label">Home</div>
-      </button>
+    <>
+      <div className="page-navbar" role="navigation" aria-label="Bottom navigation">
+        <button
+          className={`nav-btn ${loc.pathname === "/home" ? "active" : ""}`}
+          onClick={() => nav("/home")}
+        >
+          <HomeIcon className="nav-icon" />
+          <div className="nav-label">Home</div>
+        </button>
 
-      <button
-        className={`nav-btn ${loc.pathname === "/mybooks" ? "active" : ""}`}
-        onClick={() => nav("/mybooks")}
-      >
-        <MenuBookIcon className="nav-icon" />
-        <div className="nav-label">My Books</div>
-      </button>
+        <button
+          className={`nav-btn ${loc.pathname === "/mybooks" ? "active" : ""}`}
+          onClick={() => nav("/mybooks")}
+        >
+          <MenuBookIcon className="nav-icon" />
+          <div className="nav-label">My Books</div>
+        </button>
 
-      <button
-        className={`nav-btn ${loc.pathname === "/profile" ? "active" : ""}`}
-        onClick={() => nav("/profile")}
-      >
-        <PersonIcon className="nav-icon" />
-        <div className="nav-label">Profile</div>
-      </button>
-    </div>
-  );
+        <button
+          className={`nav-btn ${loc.pathname === "/profile" ? "active" : ""}`}
+          onClick={() => nav("/profile")}
+        >
+          <PersonIcon className="nav-icon" />
+          <div className="nav-label">Profile</div>
+        </button>
+      </div>
+    </>
+  )
 }

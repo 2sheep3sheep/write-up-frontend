@@ -47,8 +47,6 @@ export default function App() {
     return fetchedBooks.response
   }
 
-
-
   const [screen, setScreen] = useState('welcome'); // welcome | signup | login | home
   // direction: +1 moving forward, -1 moving back (controls slide direction)
   const [direction, setDirection] = useState(1);
@@ -206,6 +204,7 @@ export default function App() {
                   setScreen={navTo}
                   onCreateBook={handleCreateBook}
                   onViewMyBooks={() => navTo("mybooks", 1)}
+                  onViewChapter={(id) => navTo(`/chapter/${id}`, 1)}
                   books={books}
                   setBooks={setBooks}
                   fetchBooks={fetchBooks}
@@ -226,7 +225,18 @@ export default function App() {
               </motion.div>
             } />
 
-          <Route path="/chapter/:id" element={<Chapter books={books} />} />
+          <Route path="/chapter/:id"
+            element={
+              <motion.div
+                animate={animationStateController()}
+                onAnimationComplete={() => handleAnimationFinish()}
+
+                style={{ width: '100%' }}
+              >
+
+                <Chapter books={books} setScreen={navTo} />
+              </motion.div>
+            } />
 
           <Route path="/profile"
             element={

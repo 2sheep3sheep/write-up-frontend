@@ -60,7 +60,7 @@ export default function MyBooks({
       updatedAt: new Date().toISOString(),
       chapters: Array.isArray(newBook.chapters)
         ? newBook.chapters.map(n => (typeof n === 'string' ? {
-          id: Date.now().toString(), name: n, content: "",
+          id: Date.now().toString(), index: newBook.chapters.length, book_id: newBook.id, name: n, content: "",
           createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
         } : n))
         : [],
