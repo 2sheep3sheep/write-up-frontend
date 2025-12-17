@@ -8,17 +8,19 @@
   z-index: 60;
   padding: 20px;
 }
+
 .bm-modal {
   width: min(720px, 94%);
   max-height: 90vh;
   overflow: auto;
-  background: linear-gradient(180deg, rgba(9,34,55,0.95), rgba(8,24,36,0.95));
+  background: linear-gradient(180deg, rgba(9, 34, 55, 0.95), rgba(8, 24, 36, 0.95));
   border-radius: 12px;
   padding: 22px;
-  box-shadow: 0 20px 40px rgba(2,8,16,0.6);
+  box-shadow: 0 20px 40px rgba(2, 8, 16, 0.6);
   color: #e6eef0;
   position: relative;
 }
+
 .bm-close {
   position: absolute;
   right: 14px;
@@ -29,11 +31,13 @@
   font-size: 20px;
   cursor: pointer;
 }
+
 .bm-title {
   margin: 4px 0 6px 0;
   font-size: 22px;
   color: #fff;
 }
+
 .bm-sub {
   margin: 0 0 14px 0;
   color: #98b4c9;
@@ -70,11 +74,12 @@
 .book-chapter,
 .chapter-card,
 .bm-chapter {
-  background: rgba(14,39,53,0.45);
+  background: rgba(14, 39, 53, 0.45);
   padding: 18px;
   border-radius: 14px;
   margin-bottom: 16px;
-  overflow: hidden;              /* щоб довгі елементи не вистрибували за рамку */
+  overflow: hidden;
+  /* щоб довгі елементи не вистрибували за рамку */
   word-wrap: break-word;
   -webkit-font-smoothing: antialiased;
   box-sizing: border-box;
@@ -103,23 +108,29 @@
 .book-chapter .content,
 .cbm-chapter-text,
 .bm-chapter-text {
-  margin-top: 10px;
-  white-space: normal !important;      /* дозволяємо переноси рядків */
-  overflow-wrap: anywhere;            /* переносить дуже довгі слова/URL */
-  word-break: break-word;             /* резервний варіант для старих браузерів */
+  white-space: normal !important;
+  /* дозволяємо переноси рядків */
+  overflow-wrap: anywhere;
+  /* переносить дуже довгі слова/URL */
+  word-break: break-word;
+  /* резервний варіант для старих браузерів */
   line-height: 1.45;
-  color: rgba(255,255,255,0.9);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 /* Якщо у вас є <pre> або інші елементи, які викликають overflow — обмежимо їх */
 .chapter-body pre,
 .chapter-body code {
-  white-space: pre-wrap;              /* зберігає форматування, але дозволяє переноси */
+  white-space: pre-wrap;
+  /* зберігає форматування, але дозволяє переноси */
   overflow-wrap: anywhere;
 }
 
 /* Додатково — щоб скрол не з'їдав тінь або border-radius */
-.chapter-body > * { max-width: 100%; box-sizing: border-box; }
+.chapter-body>* {
+  max-width: 100%;
+  box-sizing: border-box;
+}
 
 /* ===== Loader overlay for BookDetail ===== */
 .loader-overlay {
@@ -147,3 +158,14 @@
   }
 }
 
+@media (max-width: 576px) {
+  .bm-chapter-textarea {
+    width: 93%;
+  }
+}
+
+@media (max-width: 487px) {
+  .bm-chapter-title-input {
+    min-width: 75px;
+  }
+}

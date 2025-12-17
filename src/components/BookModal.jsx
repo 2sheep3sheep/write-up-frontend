@@ -1,46 +1,64 @@
 // src/components/BookModal.jsx
 import React, { useEffect, useState } from "react";
 import "../styles/book-modal.css";
+import FetchHelper from "../fetchHelper";
 
 export default function BookModal({
   open = false,
   book = null,
   mode = "view", // "view" | "edit"
-  onClose = () => {},
-  onSave = () => {},
+  onClose = () => { },
+  onSave = () => { },
+  onViewChapter = () => { }
 }) {
   if (!open || !book) return null;
 
   const isView = mode === "view";
 
   // ---------- helper: нормалізація книги для EDIT ----------
-  function normalizeBook(b) {
+  async function normalizeBook(b) {
+    
+    const result = await FetchHelper.books.get(undefined,b.id);
+    console.log(result.response);
+
+    return result.response;
+
+
     if (!b) {
       return {
         id: "",
-        title: "",
+        name: "",
+        genre: "",
         description: "",
         chapters: [],
+        createdAt: null,
+        updatedAt: null
       };
     }
 
     return {
       id: b.id ?? "",
-      title: b.title ?? "",
+      name: b.name ?? "",
+      genre: b.genre ?? "",
       description: b.description ?? "",
       chapters: Array.isArray(b.chapters)
-        ? b.chapters.map((c, idx) => ({
-            id: c.id ?? `ch-${idx}-${Date.now()}`,
-            title: c.title ?? "",
-            content: c.content ?? "",
-            lastEdited: c.lastEdited ?? null,
-          }))
+        ? b.chapters.map((c) => ({
+          id: c.id ?? Date.now(),
+          index: c.index ?? null,
+          book_id: b.id ?? "",
+          name: c.name ?? "",
+          content: c.content ?? "",
+          createdAt: c.createdAt ?? null,
+          updatedAt: c.updatedAt ?? null
+        }))
         : [],
+      createdAt: b.createdAt ?? null,
+      updatedAt: b.updatedAt ?? null
     };
   }
 
   // draft для EDIT
-  const [draft, setDraft] = useState(() => normalizeBook(book));
+  const [draft, setDraft] = useState(async () => await normalizeBook(book));
 
   // розгортання глав:
   //  - для VIEW – по _viewId
@@ -51,11 +69,11 @@ export default function BookModal({
   // loader
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
+  useEffect( async () => {
     setIsLoading(true);
 
-    const timer = setTimeout(() => {
-      setDraft(normalizeBook(book));
+    const timer = setTimeout( async () => {
+      setDraft( await normalizeBook(book) );
       setViewExpandedId(null);
       setEditExpandedId(null);
       setIsLoading(false);
@@ -67,8 +85,14 @@ export default function BookModal({
   // ---------- handlers для EDIT ----------
   const handleTitleChange = (e) => {
     const value = e.target.value;
-    setDraft((prev) => ({ ...prev, title: value }));
+    setDraft((prev) => ({ ...prev, name: value }));
   };
+
+  const handleGenreChange = (e) => {
+    const value = e.target.value;
+    setDraft((prev) => ({ ...prev, genre: value }));
+  };
+
 
   const handleDescChange = (e) => {
     const value = e.target.value;
@@ -79,7 +103,7 @@ export default function BookModal({
     setDraft((prev) => ({
       ...prev,
       chapters: prev.chapters.map((ch) =>
-        ch.id === chapterId ? { ...ch, title: value } : ch
+        ch.id === chapterId ? { ...ch, name: value, updatedAt: new Date().toISOString() } : ch
       ),
     }));
   };
@@ -89,26 +113,36 @@ export default function BookModal({
       ...prev,
       chapters: prev.chapters.map((ch) =>
         ch.id === chapterId
-          ? { ...ch, content: value, lastEdited: new Date().toISOString() }
+          ? { ...ch, content: value, updatedAt: new Date().toISOString() }
           : ch
       ),
     }));
   };
 
-  const handleAddChapter = () => {
-    const id = `new-${Date.now()}`;
+  const handleAddChapter = async () => {
+    const result = await FetchHelper.books.chapters.create({name:"New Chapter"},book.id)
+    setDraft( await normalizeBook(book) )
+
+    /*
+    const id = Date.now().toString();
     setDraft((prev) => ({
       ...prev,
       chapters: [
         ...prev.chapters,
-        { id, title: "New chapter", content: "", lastEdited: null },
+        {
+          id: id, index: prev.chapters.length + 1, book_id: prev.id, name: "New chapter", content: "",
+          createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+        },
       ],
     }));
     setEditExpandedId(id);
+  */
   };
 
   const handleRemoveChapter = (chapterId) => {
-    const ok = window.confirm("Delete this chapter?");
+    const chapter = draft.chapters.find(chapter => chapter.id === chapterId);
+
+    const ok = window.confirm(`Delete chapter "${chapter.name}" ? This is irreversible.`);
     if (!ok) return;
 
     setDraft((prev) => ({
@@ -119,11 +153,21 @@ export default function BookModal({
     setEditExpandedId((prev) => (prev === chapterId ? null : prev));
   };
 
-  const handleSaveClick = () => {
+  const handleSaveClick = async () => {
     const updated = {
       ...draft,
-      lastEdited: new Date().toISOString(),
+      name: draft.name,
+      updatedAt: new Date().toISOString(),
     };
+
+    const response = await FetchHelper.books.edit( {
+      name: draft.name,
+      genre: draft.genre
+    }, draft.id)
+
+    console.log("EDIT BOOK RESPONSE")
+    console.log(response)
+
     onSave(updated);
   };
 
@@ -183,7 +227,31 @@ export default function BookModal({
                 border: "1px solid rgba(255,255,255,0.04)",
               }}
             >
-              {book.title || <em>No title</em>}
+              {book.name || <em>No title</em>}
+            </div>
+          </div>
+
+          {/* Genre */}
+          <div style={{ marginBottom: 16 }}>
+            <div
+              style={{
+                fontSize: 14,
+                color: "#98b4c9",
+                marginBottom: 4,
+                fontWeight: 600,
+              }}
+            >
+              Genre
+            </div>
+            <div
+              style={{
+                padding: "10px 12px",
+                borderRadius: 8,
+                background: "rgba(255,255,255,0.02)",
+                border: "1px solid rgba(255,255,255,0.04)",
+              }}
+            >
+              {book.genre || <em>No genre</em>}
             </div>
           </div>
 
@@ -298,9 +366,29 @@ export default function BookModal({
           </div>
           <input
             className="bm-chapter-title-input"
-            value={draft.title}
+            value={draft.name}
             onChange={handleTitleChange}
             placeholder="Book title"
+          />
+        </div>
+
+        {/* GENRE */}
+        <div style={{ marginBottom: 16 }}>
+          <div
+            style={{
+              fontSize: 14,
+              color: "#98b4c9",
+              marginBottom: 4,
+              fontWeight: 600,
+            }}
+          >
+            Genre
+          </div>
+          <input
+            className="bm-chapter-title-input"
+            value={draft.genre}
+            onChange={handleGenreChange}
+            placeholder="Genre"
           />
         </div>
 
@@ -342,7 +430,7 @@ export default function BookModal({
 
                     <input
                       className="bm-chapter-title-input"
-                      value={ch.title}
+                      value={ch.name}
                       onChange={(e) =>
                         handleChapterTitleChange(ch.id, e.target.value)
                       }
