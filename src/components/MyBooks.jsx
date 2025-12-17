@@ -24,9 +24,14 @@ export default function MyBooks({
     }
   });
 
+
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("");
+
+  /* 
   const filteredBooks = list.filter(b =>
     b.title.toLowerCase().includes(search.toLowerCase())
-  );
+  );*/
   
   const books = []
 
@@ -51,10 +56,14 @@ export default function MyBooks({
   const [createOpen, setCreateOpen] = useState(false);
   const [openBook, setOpenBook] = useState(null);
   const [modalMode, setModalMode] = useState("view");
+  
 
   const openView = (book) => {
+    /*
     setOpenBook(book);
     setModalMode("view");
+    */
+    setScreen(`book/${book.id}`,1)
   };
 
   const openEdit = (book) => {
@@ -144,7 +153,7 @@ export default function MyBooks({
         <SearchField value={search} onChange={setSearch} />
 
         <BookList
-          books={filteredBooks}
+          books={list}
           onView={openView}
           onEdit={openEdit}
           onDelete={handleDelete}

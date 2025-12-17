@@ -82,56 +82,10 @@ export default function HomeScreen({
             setError("Failed to load books. Try again.");
             setBookListCall({ state: "error" });
         }
-    }
-  };
+    };
+  
 
   useEffect(() => {
-    loadBooks(books);
-  }, [books]);
-
-  const handleLogout = () => {
-    setLogoutCall({ state: "pending" });
-    setTimeout(() => {
-      setLogoutCall({ state: "success" });
-      if (setScreen) setScreen("/login");
-    }, 700);
-  };
-
-  return (
-    <div className="home-root">
-      <header className="home-header">
-        <div className="header-left">
-          <BackArrow onClick={() => setScreen && setScreen("/")} />
-        </div>
-        <div className="header-center">
-          <h1 className="home-title">Welcome back, {username}</h1>
-          <p className="home-sub">Continue your writing journey</p>
-        </div>
-        <div className="header-right">
-          <button aria-label="Logout" className="logout-btn" onClick={handleLogout}>
-            {logoutCall.state === "pending" ? (
-              <ClipLoader color="var(--accent)" size={18} />
-            ) : (
-              <span className="logout-inner"><LogoutIcon fontSize="small" /> Logout</span>
-            )}
-          </button>
-        </div>
-      </header>
-
-      <main className="home-main">
-        <div className="home-actions">
-          <button className="action-card action-new" onClick={() => setCreateOpen(true)}>
-            <div className="action-icon">+</div>
-            <div className="action-text">New Book</div>
-          </button>
-
-          <button className="action-card action-mybooks" onClick={() => onViewMyBooks && onViewMyBooks()}>
-            <div className="action-icon">📚</div>
-            <div className="action-text">My Books</div>
-          </button>
-        </div>
-
-    useEffect(() => {
         loadBooks(books);
     }, [books]);
 
@@ -140,7 +94,7 @@ export default function HomeScreen({
         setModalMode("view");
     };
 
-    const handleLogout = () => {
+  const handleLogout = () => {
         setLogoutCall({ state: "pending" });
         setTimeout(() => {
             setLogoutCall({ state: "success" });
@@ -148,7 +102,7 @@ export default function HomeScreen({
             removeLocalSessionData();
         }, 700);
     };
-
+    
     return (
         <div className="home-root">
             <header className="home-header">

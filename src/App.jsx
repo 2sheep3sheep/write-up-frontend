@@ -10,6 +10,7 @@ import Chapter from "./components/Chapter";
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import FetchHelper from "./fetchHelper";
 import { path } from "framer-motion/client";
+import BookDetail from "./components/BookDetail";
 
 const pageVariants = {
 
@@ -251,6 +252,7 @@ export default function App() {
                 <MyBooks 
                   books={books}
                   setBooks={setBooks}
+                  setScreen={navTo}
                   handleCreateBook={handleCreateBook}
                   onViewChapter={(id) => navTo(`/chapter/${id}`, 1)}
                   fetchBooks={fetchBooks}
@@ -270,6 +272,20 @@ export default function App() {
                 <Chapter books={books} setScreen={navTo} fetchBooks={fetchBooks} />
               </motion.div>
             } />
+
+          <Route path="/book/:id"
+            element={
+              <motion.div
+                animate={animationStateController()}
+                onAnimationComplete={() => handleAnimationFinish()}
+
+                style={{ width: '100%' }}
+              >
+
+                <BookDetail setScreen={navTo} />
+              </motion.div>
+            } />
+
 
           <Route path="/profile"
             element={

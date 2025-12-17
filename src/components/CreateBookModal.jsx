@@ -82,7 +82,18 @@ export default function CreateBookModal({ open, onClose = () => { }, onCreate = 
         <label className="cbm-label">Description (optional)</label>
         <textarea className="cbm-textarea" value={desc} onChange={e => setDesc(e.target.value)} placeholder="What's your book about?" />
 
-        <label className="cbm-label">Chapters</label>
+        {/* Chapters */}
+
+        <div className="cbm-actions">
+          <button className="cbm-btn cbm-btn-ghost" onClick={onClose}>Cancel</button>
+          <button className="cbm-btn cbm-btn-primary" onClick={handleCreate} disabled={!title.trim()}>Create</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/*<label className="cbm-label">Chapters</label>
         <div className="cbm-chapter-row">
           <input
             className="cbm-input"
@@ -129,12 +140,4 @@ export default function CreateBookModal({ open, onClose = () => { }, onCreate = 
             </li>
           ))}
         </ul>
-
-        <div className="cbm-actions">
-          <button className="cbm-btn cbm-btn-ghost" onClick={onClose}>Cancel</button>
-          <button className="cbm-btn cbm-btn-primary" onClick={handleCreate} disabled={!title.trim()}>Create</button>
-        </div>
-      </div>
-    </div>
-  );
-}
+*/

@@ -162,7 +162,8 @@ export default function BookModal({
 
     const response = await FetchHelper.books.edit( {
       name: draft.name,
-      genre: draft.genre
+      genre: draft.genre,
+      description: draft.description
     }, draft.id)
 
     console.log("EDIT BOOK RESPONSE")
@@ -412,7 +413,24 @@ export default function BookModal({
           />
         </div>
 
+
+        <div className="bm-actions">
+          <button className="bm-btn bm-ghost" onClick={onClose}>
+            Close
+          </button>
+          <button className="bm-btn bm-primary" onClick={handleSaveClick}>
+            Save changes
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
         {/* CHAPTERS */}
+        /*
         <h3 style={{ margin: "0 0 10px 0", color: "#e6eef0" }}>Chapters</h3>
 
         {chapters.length === 0 ? (
@@ -474,7 +492,7 @@ export default function BookModal({
             })}
           </div>
         )}
-
+          
         <button
           className="bm-btn bm-add"
           type="button"
@@ -483,16 +501,5 @@ export default function BookModal({
         >
           + Add chapter
         </button>
+*/
 
-        <div className="bm-actions">
-          <button className="bm-btn bm-ghost" onClick={onClose}>
-            Close
-          </button>
-          <button className="bm-btn bm-primary" onClick={handleSaveClick}>
-            Save changes
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
