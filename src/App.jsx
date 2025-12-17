@@ -47,6 +47,13 @@ export default function App() {
     return fetchedBooks.response
   }
 
+  // Load books into global state once
+  useEffect(() => {
+    fetchBooks().then(fetched => {
+      setBooks(fetched || []);
+    });
+  }, []);
+
   const [screen, setScreen] = useState('welcome'); // welcome | signup | login | home
   // direction: +1 moving forward, -1 moving back (controls slide direction)
   const [direction, setDirection] = useState(1);
@@ -234,7 +241,7 @@ export default function App() {
                 style={{ width: '100%' }}
               >
 
-                <Chapter books={books} setScreen={navTo} />
+                <Chapter books={books} setScreen={navTo} fetchBooks={fetchBooks} />
               </motion.div>
             } />
 
