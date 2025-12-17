@@ -16,7 +16,14 @@ export default function BookModal({
   const isView = mode === "view";
 
   // ---------- helper: нормалізація книги для EDIT ----------
-  function normalizeBook(b) {
+  async function normalizeBook(b) {
+    
+    const result = await FetchHelper.books.get(undefined,b.id);
+    console.log(result.response);
+
+    return result.response;
+
+
     if (!b) {
       return {
         id: "",
@@ -51,7 +58,7 @@ export default function BookModal({
   }
 
   // draft для EDIT
-  const [draft, setDraft] = useState(() => normalizeBook(book));
+  const [draft, setDraft] = useState(async () => await normalizeBook(book));
 
   // розгортання глав:
   //  - для VIEW – по _viewId
@@ -62,11 +69,11 @@ export default function BookModal({
   // loader
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
+  useEffect( async () => {
     setIsLoading(true);
 
-    const timer = setTimeout(() => {
-      setDraft(normalizeBook(book));
+    const timer = setTimeout( async () => {
+      setDraft( await normalizeBook(book) );
       setViewExpandedId(null);
       setEditExpandedId(null);
       setIsLoading(false);
@@ -112,7 +119,11 @@ export default function BookModal({
     }));
   };
 
-  const handleAddChapter = () => {
+  const handleAddChapter = async () => {
+    const result = await FetchHelper.books.chapters.create({name:"New Chapter"},book.id)
+    setDraft( await normalizeBook(book) )
+
+    /*
     const id = Date.now().toString();
     setDraft((prev) => ({
       ...prev,
@@ -125,6 +136,7 @@ export default function BookModal({
       ],
     }));
     setEditExpandedId(id);
+  */
   };
 
   const handleRemoveChapter = (chapterId) => {

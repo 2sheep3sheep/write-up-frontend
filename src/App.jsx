@@ -9,6 +9,7 @@ import ProfileScreen from './components/ProfileScreen';
 import Chapter from "./components/Chapter";
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import FetchHelper from "./fetchHelper";
+import { path } from "framer-motion/client";
 
 const pageVariants = {
 
@@ -80,9 +81,17 @@ export default function App() {
   const location = useLocation();
   const { pathname } = location;
 
+
+
   const [nextPath, setNextPath] = useState("/")
 
   const navigateTo = useNavigate();
+
+  
+  if ( !localStorage.getItem("accessToken") ) {
+    if ( pathname != "/" && pathname != "/signup" && pathname != "/login") navigateTo("/")
+  }
+
   function navTo(to_URI, dir = 1) {
     // While animating away, do not schedule another animation and page navigation
     if (animating) return;

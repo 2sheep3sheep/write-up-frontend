@@ -30,16 +30,22 @@ async function Call(baseUri, useCase, dtoIn, method, token = undefined) {
             } catch (e) {}
         }
 
+        //If token is invalid, try and refresh
         if ( data.code == "InvalidToken" ) {
-            const refreshTokenResult = await Call( baseUri, "user/token/refresh", {refreshToken: localStorage.getItem("refreshToken")}, "get" )
-            
-            if (refreshTokenResult.ok) {
-                localStorage.setItem("accessToken",refreshTokenResult.response.accessToken)
-            }else{
-                localStorage.removeItem("refreshToken")
-                localStorage.removeItem("accessToken")
+            const refreshToken = localStorage.getItem("refreshToken");
+            if (refreshToken && refreshToken !== "null") {
+                console.log(refreshToken)
+                const refreshTokenResult = await Call( baseUri, "user/token/refresh", {refreshToken:refreshToken }, "get" )
+
+                if (refreshTokenResult.ok) {
+                    localStorage.setItem("accessToken",refreshTokenResult.response.accessToken)
+                }else{
+                    localStorage.removeItem("refreshToken")
+                    localStorage.removeItem("accessToken")
+                }
             }
         }
+        //
 
         return { ok: response.ok, status: response.status, response: data };
     } catch (e) {
@@ -71,6 +77,7 @@ const FetchHelper = {
         chapters: {
             create: async (dtoIn, bookId) => Call(baseUri, `books/${bookId}/chapters`, dtoIn, "post"),
             get: async (dtoIn, bookId, chapterId) => Call(baseUri, `books/${bookId}/chapters/${chapterId}`, dtoIn, "get"),
+            list: async (dtoIn, bookId ) => Call(baseUri, `books/${bookId}/chapters`, dtoIn, "get"),
             edit: async (dtoIn, bookId, chapterId) => Call(baseUri, `books/${bookId}/chapters/${chapterId}`, dtoIn, "patch"),
             delete: async (dtoIn, bookId, chapterId) => Call(baseUri, `books/${bookId}/chapters/${chapterId}`, dtoIn, "delete"),
         }
