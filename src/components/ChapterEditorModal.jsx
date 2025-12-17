@@ -39,6 +39,7 @@ export default function ChapterEditorModal({ chapter, onClose, onSave }) {
           className="modal-input"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          style={{width:"calc( 100% - 20px )"}}
           placeholder="Chapter title"
         />
 
@@ -47,6 +48,7 @@ export default function ChapterEditorModal({ chapter, onClose, onSave }) {
           rows={12}
           value={content}
           onChange={(e) => setContent(e.target.value)}
+          style={{width:"calc( 100% - 20px )"}}
           placeholder="Chapter text..."
         />
 

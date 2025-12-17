@@ -85,3 +85,10 @@
   font-weight: 600;
   cursor: pointer;
 }
+
+.chapter-buttons {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  display:flex;
+  gap: 4px;
+}

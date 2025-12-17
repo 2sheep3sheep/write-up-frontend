@@ -350,7 +350,7 @@ export default function BookModal({
 
         <h2 className="bm-title">Edit book</h2>
         <p className="bm-sub">
-          Edit book title and description. Chapters can be edited below.
+          Edit book title, genre and description.
         </p>
 
         {/* TITLE */}
@@ -410,6 +410,7 @@ export default function BookModal({
             value={draft.description}
             onChange={handleDescChange}
             placeholder="Book description"
+            style={{width:"calc( 100% - 24px )"}}
           />
         </div>
 

@@ -21,9 +21,9 @@ export default function BookList({ books, onView, onEdit, onDelete, search }) {
           <div className="book-meta">{b.genre}</div>
           
           <div className="book-actions">
-            <button className="btn" onClick={() => onView(b)}>View</button>
-            <button className="btn" onClick={() => onEdit(b)}>Edit</button>
-            <button className="btn-delete" onClick={() => onDelete(b.id)}>Delete</button>
+            <button className="ds-btn ds-btn-primary" onClick={() => onView(b)}>View</button>
+            <button className="ds-btn ds-btn-secondary" onClick={() => onEdit(b)}>Edit</button>
+            <button className="ds-btn ds-btn-danger" onClick={() => onDelete(b.id)}>Delete</button>
           </div>
           
           <div className="book-tiny">Last Edited: {b.updatedAt}</div>

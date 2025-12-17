@@ -145,19 +145,25 @@ export default function BookDetail({
                   </div>
 
                   {/* Кнопка Edit – тільки в режимі редагування */}
-                  {!canEdit ? <></> :
-                    <div>
-                      <button
-                        className="chapter-edit-btn"
-                        onClick={(e) => {
-                          e.stopPropagation(); // щоб не спрацьовував відкриття тексту
-                          openEditor(c);
-                        }}
-                      >
-                        Edit
-                      </button>
+                  
+                     <div className="chapter-buttons">
+                        <button
+                          className="ds-btn ds-btn-primary"
+                        >
+                          View
+                        </button>
+                        {!canEdit ? <></> :
+                              <button
+                                className="ds-btn ds-btn-secondary"
+                                onClick={(e) => {
+                                  e.stopPropagation(); // щоб не спрацьовував відкриття тексту
+                                  openEditor(c);
+                                }}
+                              >
+                                Edit
+                              </button>
+                        }
                     </div>
-                  }
                 </div>
 
                 {/* У режимі перегляду – НЕ показуємо контент взагалі, тільки заголовок.

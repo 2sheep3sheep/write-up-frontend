@@ -35,9 +35,11 @@ async function Call(baseUri, useCase, dtoIn, method, token = undefined) {
             const refreshToken = localStorage.getItem("refreshToken");
             if (refreshToken && refreshToken !== "null") {
                 console.log(refreshToken)
-                const refreshTokenResult = await Call( baseUri, "user/token/refresh", {}, "get", refreshToken )
-                console.log("REFRESHING???")
-                console.log(refreshTokenResult)
+                const refreshTokenResult = await Call( baseUri, "user/token/refresh", undefined, "get", refreshToken )
+                if (refreshTokenResult.ok) {
+                    console.log(refreshTokenResult.response.accessToken)
+                    localStorage.setItem("accessToken", refreshTokenResult.response.accessToken)
+                }
             }
         }
         //

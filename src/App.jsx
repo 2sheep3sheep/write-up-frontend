@@ -12,6 +12,8 @@ import FetchHelper from "./fetchHelper";
 import { path } from "framer-motion/client";
 import BookDetail from "./components/BookDetail";
 
+import "./styles/design-system.css";
+
 const pageVariants = {
 
   initial: direction => ({
