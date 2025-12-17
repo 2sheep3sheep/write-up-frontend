@@ -4,8 +4,12 @@ import PageNavbar from "./generic/PageNavbar";
 import CreateBookModal from "./CreateBookModal";
 import BookModal from "./BookModal";
 import "../styles/mybooks.css";
+import SearchField from "./SearchField";
+import BookList from "./BookList";
 
 export default function MyBooks({ books = [], setBooks = () => {}, setScreen = () => {} }) {
+  const [search, setSearch] = useState("");
+
   const [list, setList] = useState(() => {
     try {
       const fromLocal = JSON.parse(localStorage.getItem("mybooks") || "[]");
@@ -14,6 +18,10 @@ export default function MyBooks({ books = [], setBooks = () => {}, setScreen = (
       return [];
     }
   });
+
+  const filteredBooks = list.filter(b =>
+    b.title.toLowerCase().includes(search.toLowerCase())
+  );
 
   useEffect(() => {
     localStorage.setItem("mybooks", JSON.stringify(list));
@@ -93,42 +101,21 @@ export default function MyBooks({ books = [], setBooks = () => {}, setScreen = (
         <h1 className="mybooks-title">My books</h1>
 
         <button
-          className="create-btn"
+          className="ds-btn ds-btn-primary create-btn"
           onClick={() => setCreateOpen(true)}
           aria-label="Create new book"
         >
           <span className="plus">+</span> <span> Create new book</span>
         </button>
 
-        <div className="books-list">
-          {list.length === 0 ? (
-            <div className="no-books">No books yet. Create your first book.</div>
-          ) : (
-            list.map(b => (
-              <div className="book-card" key={b.id}>
-                <div className="book-title">{b.title}</div>
-                <div className="book-meta">
-                  Chapters: {Array.isArray(b.chapters) ? b.chapters.length : 0} · Last edited: {b.lastEdited ? new Date(b.lastEdited).toLocaleString() : "—"}
-                </div>
+        <SearchField value={search} onChange={setSearch} />
 
-                <div className="book-actions">
-                  <button className="btn btn-view" onClick={() => openView(b)}>View</button>
-                  <button className="btn btn-edit" onClick={() => openEdit(b)}>Edit</button>
-
-                  {/* Delete button */}
-                  <button
-                    className="btn btn-delete"
-                    onClick={() => handleDelete(b.id)}
-                    aria-label={`Delete ${b.title}`}
-                    title="Delete book"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
+        <BookList
+          books={filteredBooks}
+          onView={openView}
+          onEdit={openEdit}
+          onDelete={handleDelete}
+        />
       </main>
 
       <footer className="mybooks-footer">

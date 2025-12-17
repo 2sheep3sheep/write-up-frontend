@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 
+import BookLayout from "./layouts/BookLayout";
 import WelcomeScreen from "./components/WelcomeScreen";
 import SignUpScreen from "./components/SignUpScreen";
 import LoginScreen from "./components/LoginScreen";
@@ -9,6 +10,7 @@ import HomeScreen from "./components/HomeScreen";
 import MyBooks from "./components/MyBooks";
 import ProfileScreen from "./components/ProfileScreen";
 import BookDetail from "./components/BookDetail";
+import "./styles/design-system.css";
 
 export default function App() {
   const navigate = useNavigate();
@@ -63,9 +65,23 @@ export default function App() {
         />
       } />
 
-      <Route path="/mybooks" element={<MyBooks books={books} setBooks={setBooks} onViewBook={(id) => navigate(`/book/${id}`)} />} />
+      <Route
+        path="/mybooks"
+        element={
+      <MyBooks
+        books={books}
+        setBooks={setBooks}
+        onViewBook={(id) => navigate(`/book/${id}`)}
+      />
+    }
+  />
 
-      <Route path="/book/:id" element={<BookDetail books={books} setBooks={setBooks} />} />
+<Route path="/book" element={<BookLayout />}>
+  <Route
+    path=":id"
+    element={<BookDetail books={books} setBooks={setBooks} />}
+  />
+</Route>
 
       <Route path="/profile" element={<ProfileScreen setScreen={navigate} />} />
     </Routes>

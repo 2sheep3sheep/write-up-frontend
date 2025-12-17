@@ -139,3 +139,17 @@
   transform: translateY(-1px);
   box-shadow: 0 6px 14px rgba(0,0,0,0.14);
 }
+
+.search-field {
+  margin-top: 12px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.search-field input {
+  width: 260px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+}
