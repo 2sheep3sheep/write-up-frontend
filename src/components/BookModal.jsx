@@ -189,7 +189,13 @@ export default function BookModal({
   //                      VIEW MODE
   // =========================================================
   if (isView) {
-    const chapters = draft.chapters;
+    const rawChapters = Array.isArray(book.chapters) ? book.chapters : [];
+
+    // робимо стабільний _viewId, якщо у глави немає id
+    const chapters = rawChapters.map((c, idx) => ({
+      ...c,
+      _viewId: c.id ?? `view-${idx}`,
+    }));
 
     return (
       <div className="bm-overlay">
@@ -281,23 +287,38 @@ export default function BookModal({
           ) : (
             <div className="bm-chapters">
               {chapters.map((ch, idx) => {
+                const hasContent = !!ch.content;
+                const isExpanded = viewExpandedId === ch._viewId;
+
                 return (
-                  <div key={ch.id} className="bm-chapter">
+                  <div key={ch._viewId} className="bm-chapter">
                     <div className="bm-chapter-header">
                       <div className="bm-chapter-index">{idx + 1}</div>
                       <div className="bm-chapter-title">
-                        {ch.name || <em>Untitled chapter</em>}
+                        {ch.title || <em>Untitled chapter</em>}
                       </div>
+                    </div>
 
+                    {/* Текст ВЗАГАЛІ не видно, поки не expanded */}
+                    {hasContent && isExpanded && (
+                      <div className="bm-chapter-content">
+                        <p className="bm-pre">{ch.content}</p>
+                      </div>
+                    )}
+
+                    {hasContent && (
                       <button
                         className="bm-ghost"
-                        onClick={() => onViewChapter(ch.id)}
-                        style={{ padding: "6px 10px", minWidth: 105 }}
-                        type="button"
+                        style={{ marginTop: 8, padding: "4px 10px" }}
+                        onClick={() =>
+                          setViewExpandedId((prev) =>
+                            prev === ch._viewId ? null : ch._viewId
+                          )
+                        }
                       >
-                        View chapter
+                        {isExpanded ? "Hide text" : "Show text"}
                       </button>
-                    </div>
+                    )}
                   </div>
                 );
               })}

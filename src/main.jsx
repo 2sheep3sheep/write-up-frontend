@@ -21,21 +21,6 @@ if (import.meta.env.VITE_CLEAR_MYBOOKS === "1") {
 }
 // -----------------------
 
-
-// Refresh token if already logged in before
-const refreshToken = localStorage.getItem("refreshToken")
-const accessToken = localStorage.getItem("accessToken")
-
-/*
-if (refreshToken && accessToken) {
-    const refreshTokenResult = await FetchHelper.user.refresh({}, refreshToken)
-    console.log(refreshTokenResult)
-    if (refreshTokenResult.ok) {
-        localStorage.setItem("accessToken",refreshTokenResult.response.accessToken)
-    }
-}*/
-
-
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>

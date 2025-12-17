@@ -1,0 +1,47 @@
+/* === DESIGN SYSTEM === */
+
+/* Buttons */
+.ds-btn {
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.ds-btn-primary {
+  background: #ffffff;
+  color: #0d2a45;
+}
+
+.ds-btn-secondary {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+}
+
+.ds-btn-danger {
+  background: rgba(255, 80, 80, 0.85);
+  color: #fff;
+}
+
+/* Inputs */
+.ds-input {
+  width: 260px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
+
+/* Cards */
+.ds-card {
+  background: rgba(0,0,0,0.25);
+  border-radius: 18px;
+  padding: 16px;
+}
+
+/* Titles */
+.ds-title {
+  font-size: 32px;
+  font-weight: 600;
+}

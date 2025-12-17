@@ -5,6 +5,8 @@ import CreateBookModal from "./CreateBookModal";
 import BookModal from "./BookModal";
 import "../styles/mybooks.css";
 import FetchHelper from "../fetchHelper";
+import SearchField from "./SearchField";
+import BookList from "./BookList";
 
 export default function MyBooks({
   setBooks = () => { },
@@ -22,6 +24,10 @@ export default function MyBooks({
     }
   });
 
+  const filteredBooks = list.filter(b =>
+    b.title.toLowerCase().includes(search.toLowerCase())
+  );
+  
   const books = []
 
   const loadBooks = async () => {
@@ -128,42 +134,21 @@ export default function MyBooks({
         <h1 className="mybooks-title">My books</h1>
 
         <button
-          className="create-btn"
+          className="ds-btn ds-btn-primary create-btn"
           onClick={() => setCreateOpen(true)}
           aria-label="Create new book"
         >
           <span className="plus">+</span> <span> Create new book</span>
         </button>
 
-        <div className="books-list">
-          {list.length === 0 ? (
-            <div className="no-books">No books yet. Create your first book.</div>
-          ) : (
-            list.map(b => (
-              <div className="book-card" key={b.id}>
-                <div className="book-title">{b.name}</div>
-                <div className="book-meta">
-                  Genre: {b.genre} · Chapters: {Array.isArray(b.chapters) ? b.chapters.length : 0} · Last edited: {b.updatedAt ? new Date(b.updatedAt).toLocaleString() : "—"}
-                </div>
+        <SearchField value={search} onChange={setSearch} />
 
-                <div className="book-actions">
-                  <button className="btn btn-view" onClick={() => openView(b)}>View</button>
-                  <button className="btn btn-edit" onClick={() => openEdit(b)}>Edit</button>
-
-                  {/* Delete button */}
-                  <button
-                    className="btn btn-delete"
-                    onClick={() => handleDelete(b.id)}
-                    aria-label={`Delete ${b.name}`}
-                    title="Delete book"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
+        <BookList
+          books={filteredBooks}
+          onView={openView}
+          onEdit={openEdit}
+          onDelete={handleDelete}
+        />
       </main>
 
       <footer className="mybooks-footer">
