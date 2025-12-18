@@ -49,9 +49,6 @@ export default function LoginScreen({ onSignUp = () => { }, onLoginSuccess = () 
         if (response.accessToken) {
           loginLocal(response)
           onLoginSuccess();
-
-          // Pass the logged in user data into user context
-          setCurrentUser(result)
         } else {
           newValidationState.overall = response.message ?? "Something went wrong...";
         }

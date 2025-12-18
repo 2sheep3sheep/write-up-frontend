@@ -9,7 +9,6 @@ import "../styles/mybooks.css";
 import CreateBookModal from "./CreateBookModal";
 import Stack from "@mui/material/Stack";
 import BookModal from "./BookModal";
-import FetchHelper from "../fetchHelper";
 
 export default function HomeScreen({
     setScreen,
@@ -19,7 +18,6 @@ export default function HomeScreen({
     books = [],
     setBooks,
     fetchBooks,
-    fetchClientBooks,
     username = "your username",
     removeLocalSessionData,
 }) {
@@ -41,18 +39,14 @@ export default function HomeScreen({
     const loadBooks = async (sourceBooks) => {
 
         // Fetch books online
-        sourceBooks = [];
-        sourceBooks = await fetchClientBooks()
-        
-
+        sourceBooks = await fetchBooks()
         setBookList(sourceBooks);
 
         setBookListCall({ state: "pending" });
         setError(null);
         try {
-            //await new Promise((r) => setTimeout(r, 200));
-            let sb = Array.isArray(sourceBooks) && sourceBooks.length ? sourceBooks : [];
-            /*
+            await new Promise((r) => setTimeout(r, 200));
+            let sb = Array.isArray(sourceBooks) && sourceBooks.length ? sourceBooks : null;
             if (!sb) {
                 try {
                     const raw = localStorage.getItem("mybooks");
@@ -61,10 +55,6 @@ export default function HomeScreen({
                     sb = [];
                 }
             }
-            */
-
-            sb = sb.sort( (a,b) => { return new Date(b.updatedAt) - new Date(a.updatedAt) } )
-
             const recent = Array.isArray(sb) ? sb.slice(0, 3) : [];
             const booksCount = Array.isArray(sb) ? sb.length : 0;
             const chaptersCount = Array.isArray(sb)
@@ -82,10 +72,9 @@ export default function HomeScreen({
             setError("Failed to load books. Try again.");
             setBookListCall({ state: "error" });
         }
-    };
-  
+    }
 
-  useEffect(() => {
+    useEffect(() => {
         loadBooks(books);
     }, [books]);
 
@@ -94,7 +83,7 @@ export default function HomeScreen({
         setModalMode("view");
     };
 
-  const handleLogout = () => {
+    const handleLogout = () => {
         setLogoutCall({ state: "pending" });
         setTimeout(() => {
             setLogoutCall({ state: "success" });
@@ -102,7 +91,7 @@ export default function HomeScreen({
             removeLocalSessionData();
         }, 700);
     };
-    
+
     return (
         <div className="home-root">
             <header className="home-header">
@@ -201,9 +190,8 @@ export default function HomeScreen({
                     <CreateBookModal
                         open={createOpen}
                         onClose={() => setCreateOpen(false)}
-                        onCreate={async (newBook) => {
-                            if (onCreateBook) await onCreateBook(newBook);
-                            loadBooks();
+                        onCreate={(newBook) => {
+                            if (onCreateBook) onCreateBook(newBook);
                             setCreateOpen(false);
                         }}
                     />

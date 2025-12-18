@@ -4,10 +4,10 @@ export default function BookList({ books, onView, onEdit, onDelete, search }) {
   }
 
 
-/*
-          <div className="book-meta">
-            Chapters: {Array.isArray(b.chapters) ? b.chapters.length : 0}
-          </div>*/
+  /*
+            <div className="book-meta">
+              Chapters: {Array.isArray(b.chapters) ? b.chapters.length : 0}
+            </div>*/
 
   books = books.filter(b =>
     b.name.toLowerCase().includes(search.toLowerCase())
@@ -16,16 +16,16 @@ export default function BookList({ books, onView, onEdit, onDelete, search }) {
   return (
     <div className="books-list">
       {books.map(b => (
-        <div className="book-card" key={b.id}>
+        <div className="book-card" key={b.id ?? b.bookId ?? b._id}>
           <div className="book-title">{b.name}</div>
           <div className="book-meta">{b.genre}</div>
-          
+
           <div className="book-actions">
             <button className="ds-btn ds-btn-primary" onClick={() => onView(b)}>View</button>
             <button className="ds-btn ds-btn-secondary" onClick={() => onEdit(b)}>Edit</button>
-            <button className="ds-btn ds-btn-danger" onClick={() => onDelete(b.id)}>Delete</button>
+            <button className="ds-btn ds-btn-danger" onClick={() => onDelete(b)}>Delete</button>
           </div>
-          
+
           <div className="book-tiny">Last Edited: {b.updatedAt}</div>
         </div>
       ))}

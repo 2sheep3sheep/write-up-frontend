@@ -9,10 +9,6 @@ import ProfileScreen from './components/ProfileScreen';
 import Chapter from "./components/Chapter";
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import FetchHelper from "./fetchHelper";
-import { path } from "framer-motion/client";
-import BookDetail from "./components/BookDetail";
-
-import "./styles/design-system.css";
 
 const pageVariants = {
 
@@ -50,23 +46,6 @@ export default function App() {
     console.log(fetchedBooks.response)
     return fetchedBooks.response
   }
-  const fetchClientBooks = async () => {
-    const clientAuthorId = localStorage.getItem("authorId");
-    if (clientAuthorId == "null") {
-      return [];
-    } else {
-      const fetchedBooks = await FetchHelper.books.list({authorId:clientAuthorId})
-      console.log(fetchedBooks.response)
-      return fetchedBooks.response
-    }
-  }
-
-  // Load books into global state once
-  useEffect(() => {
-    fetchBooks().then(fetched => {
-      setBooks(fetched || []);
-    });
-  }, []);
 
   const [screen, setScreen] = useState('welcome'); // welcome | signup | login | home
   // direction: +1 moving forward, -1 moving back (controls slide direction)
@@ -84,17 +63,9 @@ export default function App() {
   const location = useLocation();
   const { pathname } = location;
 
-
-
   const [nextPath, setNextPath] = useState("/")
 
   const navigateTo = useNavigate();
-
-  
-  if ( !localStorage.getItem("accessToken") ) {
-    if ( pathname != "/" && pathname != "/signup" && pathname != "/login") navigateTo("/")
-  }
-
   function navTo(to_URI, dir = 1) {
     // While animating away, do not schedule another animation and page navigation
     if (animating) return;
@@ -156,11 +127,17 @@ export default function App() {
 
   const handleCreateBook = async (newBook) => {
     const response = await FetchHelper.books.create({
-      name: newBook.name || newBook.title || "Untitled",
+      name: newBook.name || "Untitled",
       genre: newBook.genre || "No Genre",
       description: newBook.description || ""
     })
     console.log(response)
+
+    // Refresh global books so /home and /mybooks update immediately
+    const fetchedBooks = await FetchHelper.books.list();
+    if (fetchedBooks?.ok) setBooks(fetchedBooks.response ?? []);
+
+    return response;
   }
 
   const loginLocal = async (response) => {
@@ -237,7 +214,6 @@ export default function App() {
                   books={books}
                   setBooks={setBooks}
                   fetchBooks={fetchBooks}
-                  fetchClientBooks={fetchClientBooks}
                   removeLocalSessionData={removeLocalSessionData}
                 />
               </motion.div>
@@ -251,14 +227,14 @@ export default function App() {
 
                 style={{ width: '100%' }}
               >
-                <MyBooks 
+                <MyBooks
                   books={books}
                   setBooks={setBooks}
                   setScreen={navTo}
-                  handleCreateBook={handleCreateBook}
                   onViewChapter={(id) => navTo(`/chapter/${id}`, 1)}
                   fetchBooks={fetchBooks}
-                  fetchClientBooks={fetchClientBooks} />
+                  handleCreateBook={handleCreateBook}
+                />
               </motion.div>
             } />
 
@@ -271,23 +247,9 @@ export default function App() {
                 style={{ width: '100%' }}
               >
 
-                <Chapter books={books} setScreen={navTo} fetchBooks={fetchBooks} />
+                <Chapter books={books} setScreen={navTo} />
               </motion.div>
             } />
-
-          <Route path="/book/:id"
-            element={
-              <motion.div
-                animate={animationStateController()}
-                onAnimationComplete={() => handleAnimationFinish()}
-
-                style={{ width: '100%' }}
-              >
-
-                <BookDetail setScreen={navTo} />
-              </motion.div>
-            } />
-
 
           <Route path="/profile"
             element={
