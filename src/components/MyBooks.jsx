@@ -32,7 +32,7 @@ export default function MyBooks({
   const filteredBooks = list.filter(b =>
     b.title.toLowerCase().includes(search.toLowerCase())
   );*/
-
+  
   const books = []
 
   const loadBooks = async () => {
@@ -56,14 +56,14 @@ export default function MyBooks({
   const [createOpen, setCreateOpen] = useState(false);
   const [openBook, setOpenBook] = useState(null);
   const [modalMode, setModalMode] = useState("view");
-
+  
 
   const openView = (book) => {
     /*
     setOpenBook(book);
     setModalMode("view");
     */
-    setScreen(`book/${book.id}`, 1)
+    setScreen(`book/${book.id}`,1)
   };
 
   const openEdit = (book) => {

@@ -13,10 +13,10 @@ export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = 
 
   const [validationState, setValidationState] = useState(
     {
-      username: "valid",
-      email: "valid",
-      password: "valid",
-      overall: "valid"
+      username:"valid",
+      email:"valid",
+      password:"valid",
+      overall:"valid"
     }
   );
 
@@ -26,121 +26,107 @@ export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = 
     // temporary: simulate loading and success
     var isValid = true
     var newValidationState = {
-      username: "valid",
-      email: "valid",
-      password: [],
-      overall: "valid"
+      username:"valid",
+      email:"valid",
+      password:[],
+      overall:"valid"
     }
 
-    if (!username) { isValid = false; newValidationState.username = "A username is required"; }
-    if (!email) { isValid = false; newValidationState.email = "An email is required"; }
+    if ( !username ) { isValid = false; newValidationState.username="A username is required"; }
+    if ( !email ) { isValid = false; newValidationState.email="An email is required"; }
 
-    if (password.length < 10) { isValid = false; newValidationState.password.push("• Password must be at least 10 characters long") }
-    if (password.toUpperCase() == password) { isValid = false; newValidationState.password.push("• Password must include lowercase characters") }
-    if (password.toLowerCase() == password) { isValid = false; newValidationState.password.push("• Password must include uppercase characters") }
+    if ( password.length < 10 ) { isValid=false; newValidationState.password.push("• Password must be at least 10 characters long") }
+    if ( password.toUpperCase() == password ) { isValid=false; newValidationState.password.push("• Password must include lowercase characters") }
+    if ( password.toLowerCase() == password ) { isValid=false; newValidationState.password.push("• Password must include uppercase characters") }
 
     var format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
 
-    if (!format.test(password)) { isValid = false; newValidationState.password.push("• Password must include a special character") }
+    if ( !format.test(password) ) { isValid=false; newValidationState.password.push("• Password must include a special character") }
+    
+    
+    if ( !password ) { isValid = false; newValidationState.password="A password is required"; }
 
-
-    if (!password) { isValid = false; newValidationState.password = "A password is required"; }
-
-    if (isValid) { newValidationState.password = "valid"; }
-
+    if (isValid) { newValidationState.password="valid"; }
+    
     if (isValid) {
-      // Call backend to register user
-      const result = await FetchHelper.user.register(
-        {
-          username: username,
-          email: email,
-          password: password
+        // Call backend to register user
+        const result = await FetchHelper.user.register(
+          {
+            username: username,
+            email: email,
+            password: password
+          }
+        )
+
+        if ( !result.ok ) {
+            newValidationState.overall = result.response.message;
         }
-      )
 
-      if (!result.ok) {
-        newValidationState.overall = result.response.message;
-      }
-
-      // If request is succesful
-      if (result.ok) {
-        const response = result.response;
-        // Response is succesful, handle response data
-        if (response.status === "success") {
-
-          if (!isAuthor) {
-            // Not an author, try logging in and navigate to home page
-            const loginResult = await FetchHelper.user.login({
-              email: email,
-              password: password
-            })
-
-            console.log("Result");
-            console.log(loginResult);
-            if (loginResult.response.status === "error") {
-              newValidationState.overall = response.message;
-            } else {
-              await loginLocal(loginResult.response);
-              onRegisterSuccess();
-            }
-
-          } else {
-            // Wants to be an author, log in, create author profile, and refresh access token
-            const loginResult = await FetchHelper.user.login({
-              email: email,
-              password: password
-            })
-            const loginResponse = loginResult.response;
-
-            console.log("Result");
-            console.log(loginResult);
-
-            // Logged user in, try creating profile
-            if (!loginResult.ok) {
-
-              newValidationState.overall = loginResponse.message;
-
-            } else {
-              await loginLocal(loginResponse)
-              // Create profile with logged in information, token must be passed in directly, instead of fetching localStorage, due to a delay
-              const createProfileResult = await FetchHelper.profile.create({
-                user_id: loginResponse.userId,
-                email: loginResponse.email,
-                username: loginResponse.username
-              }, loginResponse.accessToken)
-
-              if (createProfileResult.ok) {
-                // Update session immediately with newly created authorId
-                const authorId = createProfileResult.response.authorId;
-                await loginLocal({ ...loginResponse, authorId });
-
-                const refreshTokenResult = await FetchHelper.user.refresh(
-                  {},
-                  loginResponse.refreshToken
-                );
-
-                if (refreshTokenResult.ok) {
-                  localStorage.setItem(
-                    "accessToken",
-                    refreshTokenResult.response.accessToken
-                  );
+        // If request is succesful
+        if ( result.ok ) {
+          const response = result.response;
+          // Response is succesful, handle response data
+          if (response.status === "success") {
+             
+              if (!isAuthor) {
+                // Not an author, try logging in and navigate to home page
+                const loginResult = await FetchHelper.user.login({
+                  email: email,
+                  password: password
+                })
+                
+                console.log("Result")
+                console.log(loginResult)
+                if (loginResult.response.status === "error"){
+                  newValidationState.overall = response.message;
+                }else{
+                  await loginLocal(loginResult.response)
+                  onRegisterSuccess();
                 }
 
-                onRegisterSuccess();
-              }
-            }
-          }
-        }
-        // Error, display response error
-        if (response.status === "error") {
-          newValidationState.overall = response.message;
-        }
+              } else {
+                // Wants to be an author, log in, create author profile, and refresh access token
+                const loginResult = await FetchHelper.user.login({
+                  email: email,
+                  password: password
+                })
+                const loginResponse = loginResult.response;
+                // Logged user in, try creating profile
+                if (!loginResult.ok) {
 
-      } else {
-        if (newValidationState.overall == "valid") newValidationState.overall = "Something went wrong...";
-      }
-    } else {
-      //invalid
+                  newValidationState.overall = loginResponse.message;
+
+                }else{
+                  await loginLocal(loginResponse)
+                  // Create profile with logged in information, token must be passed in directly, instead of fetching localStorage, due to a delay
+                  const createProfileResult = await FetchHelper.profile.create({
+                        user_id: loginResponse.userId,
+                        email: loginResponse.email,
+                        username: loginResponse.username
+                  },loginResponse.accessToken)
+
+                  if (createProfileResult.ok) {
+                    // Created profile, refresh user token in the localStorage, and then move to home page
+                    const refreshTokenResult = await FetchHelper.user.refresh({}, loginResponse.refreshToken)
+                    console.log(refreshTokenResult)
+                    if (refreshTokenResult.ok) {
+                      localStorage.setItem("accessToken",refreshTokenResult.response.accessToken)
+                      onRegisterSuccess()
+                    }
+                  }
+                }
+              }
+          }
+          // Error, display response error
+          if (response.status === "error") {
+            newValidationState.overall = response.message;
+          }
+
+        }else{
+          if (newValidationState.overall=="valid") newValidationState.overall = "Something went wrong...";
+        }
+    }else{
+        //invalid
     }
     setValidationState(newValidationState)
   }
@@ -153,14 +139,14 @@ export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = 
         <h1 className="title">Welcome</h1>
         <p className="subtitle">Sign up to get started</p>
 
-        <input className="input" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
+        <input className="input" placeholder="Username" value={username} onChange={ (e) => setUsername(e.target.value) }/>
         <div className="error-message">{validationState.username != "valid" ? validationState.username : ""}</div>
 
-        <input className="input" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input className="input" placeholder="Email" value={email} onChange={ (e) => setEmail(e.target.value) }/>
         <div className="error-message">{validationState.email != "valid" ? validationState.email : ""}</div>
 
-        <input className="input" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-        <div className="error-message">{validationState.password != "valid" ? validationState.password.map((e) => <div>{e}</div>) : ""}</div>
+        <input className="input" type="password" placeholder="Password" value={password} onChange={ (e) => setPassword(e.target.value) }/>
+        <div className="error-message">{validationState.password != "valid" ? validationState.password.map( (e)=> <div>{e}</div> ) : ""}</div>
 
         <div className="checkbox-row" onClick={() => setIsAuthor(!isAuthor)} style={{ cursor: 'pointer' }}>
           <div className={`checkbox ${isAuthor ? 'checked' : ''}`}>{isAuthor && <div className="tick" />}</div>
