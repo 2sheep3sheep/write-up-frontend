@@ -55,7 +55,14 @@ export default function HomeScreen({
         if (isAuthor) {
             sourceBooks = await fetchClientBooks();
         } else {
-            sourceBooks = await fetchBooks({offset:bookOffset, limit:20});
+            var searchParams = {offset:bookOffset, limit:20}
+
+            if (search!=="") {
+                if (searchMode === "name") searchParams.name = search
+                if (searchMode === "genre") searchParams.genre = search
+            }
+
+            sourceBooks = await fetchBooks(searchParams);
         }
 
 
@@ -227,9 +234,15 @@ export default function HomeScreen({
                 </> : <div className="mybooks-root">
                     <main className="mybooks-main">
 
-                        <Stack direction="horizontal" style={{ justifyContent:"center", verticalAlign:"middle"}}>
+                        <Stack direction="horizontal" style={{ justifyContent:"center"}}>
                         <SearchField value={search} onChange={setSearch}/>
-                        <button className="ds-btn ds-btn-primary" style={{height:"30px", verticalAlign:"middle"}}><SearchIcon/></button>
+                        <button className="ds-btn ds-btn-primary" style={{height:"30px", marginTop:"12px", paddingTop:"4px"}} 
+                            onClick = {
+                                () => {
+                                    loadBooks(null,bookRange)
+                                }
+                            }
+                        ><SearchIcon/></button>
                         </Stack>
                         <Stack direction="horizontal" style={{justifyContent:"center", marginBottom:"24px"}}>
                             Search by 
@@ -283,7 +296,7 @@ export default function HomeScreen({
                                         </div>
 
                                         <div className="book-actions">
-                                            <button className="btn btn-view" onClick={() => openView(b)}>View</button>
+                                            <button className="btn btn-view" onClick={() => setScreen(`/book/${b.id}`,1)}>View</button>
                                         </div>
                                     </div>
                                 ))}
