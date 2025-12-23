@@ -45,8 +45,8 @@ export default function App() {
   // GLOBAL BOOK STATE (синхронізація з localStorage)
   const [books, setBooks] = useState([])
 
-  const fetchBooks = async () => {
-    const fetchedBooks = await FetchHelper.books.list()
+  const fetchBooks = async (searchParams = undefined) => {
+    const fetchedBooks = await FetchHelper.books.list(searchParams)
     console.log(fetchedBooks.response)
     return Array.isArray(fetchedBooks.response) ? fetchedBooks.response : []
   }

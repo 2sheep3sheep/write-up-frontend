@@ -47,6 +47,7 @@ export default function LoginScreen({ onSignUp = () => { }, onLoginSuccess = () 
         const response = result.response;
         // Response is succesful, handle response data
         if (response.accessToken) {
+          console.log(response)
           loginLocal(response)
           onLoginSuccess();
         } else {

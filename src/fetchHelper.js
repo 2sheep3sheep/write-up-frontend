@@ -1,7 +1,7 @@
 
 
 async function Call(baseUri, useCase, dtoIn, method, token = undefined) {
-    console.log(localStorage.getItem("accessToken"))
+    //console.log(localStorage.getItem("accessToken"))
     let response;
 
     try {
@@ -30,14 +30,15 @@ async function Call(baseUri, useCase, dtoIn, method, token = undefined) {
             } catch (e) { }
         }
 
-        //
+        
         if (data.code == "InvalidToken") {
             const refreshToken = localStorage.getItem("refreshToken");
+            const accessToken = localStorage.getItem("accessToken");
             if (refreshToken && refreshToken !== "null") {
 
                 console.log(refreshToken)
 
-                const refreshTokenResult = await Call(baseUri, "user/token/refresh", undefined, "get", refreshToken)
+                const refreshTokenResult = await Call(baseUri, "user/token/refresh", {accessToken:accessToken}, "get", refreshToken)
 
                 if (refreshTokenResult.ok) {
                     console.log(refreshTokenResult.response.accessToken)
@@ -45,6 +46,7 @@ async function Call(baseUri, useCase, dtoIn, method, token = undefined) {
                 }
             }
         }
+        
 
         return { ok: response.ok, status: response.status, response: data };
     } catch (e) {
