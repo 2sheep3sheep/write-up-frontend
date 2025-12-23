@@ -148,6 +148,7 @@ export default function BookDetail({
   };
 
   const handleChapterClick = async (chapter) => {
+    /*
     const result = await FetchHelper.books.chapters.get(
       undefined,
       bookId,
@@ -156,7 +157,8 @@ export default function BookDetail({
 
     if (result.ok) {
       setOpenedChapter(result.response);
-    }
+    }*/
+    setScreen(`book/${bookId}/chapter/${chapter.id}`,1)
   };
 
   return (
@@ -209,6 +211,12 @@ export default function BookDetail({
                     <div className="chapter-buttons">
                       <button
                         className="ds-btn ds-btn-primary"
+                        onClick={
+                          (e) => {
+                            e.stopPropagation();
+                            handleChapterClick(c);
+                          }
+                        }
                       >
                         View
                       </button>

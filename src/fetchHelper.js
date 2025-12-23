@@ -1,7 +1,7 @@
 
 
 async function Call(baseUri, useCase, dtoIn, method, token = undefined) {
-
+    console.log(localStorage.getItem("accessToken"))
     let response;
 
     try {
@@ -31,11 +31,14 @@ async function Call(baseUri, useCase, dtoIn, method, token = undefined) {
         }
 
         //
-        if (false && data.code == "InvalidToken") {
+        if (data.code == "InvalidToken") {
             const refreshToken = localStorage.getItem("refreshToken");
             if (refreshToken && refreshToken !== "null") {
+
                 console.log(refreshToken)
+
                 const refreshTokenResult = await Call(baseUri, "user/token/refresh", undefined, "get", refreshToken)
+
                 if (refreshTokenResult.ok) {
                     console.log(refreshTokenResult.response.accessToken)
                     localStorage.setItem("accessToken", refreshTokenResult.response.accessToken)

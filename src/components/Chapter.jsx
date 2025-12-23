@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import BackArrow from "./generic/BackArrow";
 import "../styles/chapter.css";
+import FetchHelper from "../fetchHelper";
 
 function Chapter({ books, setScreen, fetchBooks }) {
     const [chapterCall, setChapterCall] = useState("inactive");
@@ -10,7 +11,8 @@ function Chapter({ books, setScreen, fetchBooks }) {
     const [bookData, setBookData] = useState(null);
 
     const params = useParams();
-    const chapterId = params.id;
+    const chapterId = params.chapterid;
+    const bookId = params.bookid;
 
     // Helper to find chapter in a books list
     const findChapterInBooks = (booksList) => {
@@ -27,6 +29,18 @@ function Chapter({ books, setScreen, fetchBooks }) {
     const loadChapter = async () => {
         setChapterCall("pending");
 
+        const result = await FetchHelper.books.chapters.get(null,bookId,chapterId)
+
+        console.log(result)
+
+        if (result.ok) {
+            setChapterData(result.response)
+            setChapterCall("success");
+            return;
+        }else{ 
+            setChapterCall("error");
+        }
+        /*
         try {
             // Try finding the chapter in books prop
             let result = findChapterInBooks(books);
@@ -47,7 +61,7 @@ function Chapter({ books, setScreen, fetchBooks }) {
         } catch (err) {
             console.error(err);
             setChapterCall("error");
-        }
+        }*/
     };
 
     // Load chapter on mount
@@ -131,7 +145,7 @@ function Chapter({ books, setScreen, fetchBooks }) {
         <div className="chapter-root">
             <header className="chapter-header">
                 <div className="header-left">
-                    <BackArrow onClick={() => setScreen("/home", -1)} />
+                    <BackArrow onClick={() => setScreen(`/book/${bookId}`, -1)} />
                 </div>
                 <div className="header-center">
                     <h1 className="chapter-title">

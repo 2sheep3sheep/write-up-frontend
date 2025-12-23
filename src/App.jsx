@@ -262,7 +262,7 @@ export default function App() {
               </motion.div>
             } />
 
-          <Route path="/chapter/:id"
+          <Route path="/book/:bookid/chapter/:chapterid"
             element={
               <motion.div
                 animate={animationStateController()}
