@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import "../styles/chapter-editor.css";
 
 export default function ChapterEditorModal({ chapter, onClose, onSave }) {
-  const [title, setTitle] = useState(chapter?.title || "");
+  // Support both 'title' and 'name' for chapter title
+  const [title, setTitle] = useState(chapter?.title || chapter?.name || "");
   const [content, setContent] = useState(chapter?.content || "");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    setTitle(chapter?.title || "");
+    setTitle(chapter?.title || chapter?.name || "");
     setContent(chapter?.content || "");
   }, [chapter]);
 
@@ -19,11 +20,12 @@ export default function ChapterEditorModal({ chapter, onClose, onSave }) {
     const payload = {
       ...chapter,
       title: title.trim() || "Untitled",
+      name: title.trim() || "Untitled", // Also set name for backend compatibility
       content,
     };
 
     await new Promise(r => setTimeout(r, 180));
-    onSave(payload);
+    await onSave(payload);
 
     setSaving(false);
   };

@@ -48,16 +48,16 @@ export default function App() {
   const fetchBooks = async () => {
     const fetchedBooks = await FetchHelper.books.list()
     console.log(fetchedBooks.response)
-    return fetchedBooks.response
+    return Array.isArray(fetchedBooks.response) ? fetchedBooks.response : []
   }
   const fetchClientBooks = async () => {
     const clientAuthorId = localStorage.getItem("authorId");
-    if (clientAuthorId == "null") {
+    if (clientAuthorId == "null" || !clientAuthorId) {
       return [];
     } else {
-      const fetchedBooks = await FetchHelper.books.list({authorId:clientAuthorId})
+      const fetchedBooks = await FetchHelper.books.list({ authorId: clientAuthorId })
       console.log(fetchedBooks.response)
-      return fetchedBooks.response
+      return Array.isArray(fetchedBooks.response) ? fetchedBooks.response : []
     }
   }
 
@@ -90,9 +90,9 @@ export default function App() {
 
   const navigateTo = useNavigate();
 
-  
-  if ( !localStorage.getItem("accessToken") ) {
-    if ( pathname != "/" && pathname != "/signup" && pathname != "/login") navigateTo("/")
+
+  if (!localStorage.getItem("accessToken")) {
+    if (pathname != "/" && pathname != "/signup" && pathname != "/login") navigateTo("/")
   }
 
   function navTo(to_URI, dir = 1) {
@@ -251,7 +251,7 @@ export default function App() {
 
                 style={{ width: '100%' }}
               >
-                <MyBooks 
+                <MyBooks
                   books={books}
                   setBooks={setBooks}
                   setScreen={navTo}

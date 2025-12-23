@@ -8,8 +8,7 @@ export default function BookModal({
   book = null,
   mode = "view", // "view" | "edit"
   onClose = () => { },
-  onSave = () => { },
-  onViewChapter = () => { }
+  onSave = () => { }
 }) {
   if (!open || !book) return null;
 
@@ -17,48 +16,28 @@ export default function BookModal({
 
   // ---------- helper: нормалізація книги для EDIT ----------
   async function normalizeBook(b) {
-    
-    const result = await FetchHelper.books.get(undefined,b.id);
-    console.log(result.response);
+    const bookResult = await FetchHelper.books.get(undefined, b.id);
+    const book = bookResult.response;
 
-    return result.response;
-
-
-    if (!b) {
-      return {
-        id: "",
-        name: "",
-        genre: "",
-        description: "",
-        chapters: [],
-        createdAt: null,
-        updatedAt: null
-      };
-    }
+    const chaptersWithContent = await Promise.all(
+      (book.chapters || []).map(async (ch) => {
+        const res = await FetchHelper.books.chapters.get(
+          undefined,
+          book.id,
+          ch.id
+        );
+        return res.ok ? res.response : { ...ch, content: "" };
+      })
+    );
 
     return {
-      id: b.id ?? "",
-      name: b.name ?? "",
-      genre: b.genre ?? "",
-      description: b.description ?? "",
-      chapters: Array.isArray(b.chapters)
-        ? b.chapters.map((c) => ({
-          id: c.id ?? Date.now(),
-          index: c.index ?? null,
-          book_id: b.id ?? "",
-          name: c.name ?? "",
-          content: c.content ?? "",
-          createdAt: c.createdAt ?? null,
-          updatedAt: c.updatedAt ?? null
-        }))
-        : [],
-      createdAt: b.createdAt ?? null,
-      updatedAt: b.updatedAt ?? null
+      ...book,
+      chapters: chaptersWithContent,
     };
   }
 
   // draft для EDIT
-  const [draft, setDraft] = useState(async () => await normalizeBook(book));
+  const [draft, setDraft] = useState(null);
 
   // розгортання глав:
   //  - для VIEW – по _viewId
@@ -69,15 +48,25 @@ export default function BookModal({
   // loader
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect( () => {
+  useEffect(() => {
+    if (!open || !book) return;
+
     setIsLoading(true);
 
-    const timer = setTimeout( async () => {
-      setDraft( await normalizeBook(book) );
-      setViewExpandedId(null);
-      setEditExpandedId(null);
-      setIsLoading(false);
-    }, 300);
+    const loadBook = async () => {
+      try {
+        const normalized = await normalizeBook(book);
+        setDraft(normalized);
+        setViewExpandedId(null);
+        setEditExpandedId(null);
+      } catch (error) {
+        console.error("Error loading book:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const timer = setTimeout(loadBook, 300);
 
     return () => clearTimeout(timer);
   }, [book, mode, open]);
@@ -85,82 +74,87 @@ export default function BookModal({
   // ---------- handlers для EDIT ----------
   const handleTitleChange = (e) => {
     const value = e.target.value;
-    setDraft((prev) => ({ ...prev, name: value }));
+    setDraft((prev) => prev ? ({ ...prev, name: value }) : null);
   };
 
   const handleGenreChange = (e) => {
     const value = e.target.value;
-    setDraft((prev) => ({ ...prev, genre: value }));
+    setDraft((prev) => prev ? ({ ...prev, genre: value }) : null);
   };
 
 
   const handleDescChange = (e) => {
     const value = e.target.value;
-    setDraft((prev) => ({ ...prev, description: value }));
+    setDraft((prev) => prev ? ({ ...prev, description: value }) : null);
   };
 
   const handleChapterTitleChange = (chapterId, value) => {
-    setDraft((prev) => ({
-      ...prev,
-      chapters: prev.chapters.map((ch) =>
-        ch.id === chapterId ? { ...ch, name: value, updatedAt: new Date().toISOString() } : ch
-      ),
-    }));
+    setDraft((prev) => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        chapters: (prev.chapters || []).map((ch) =>
+          ch.id === chapterId ? { ...ch, name: value, updatedAt: new Date().toISOString() } : ch
+        ),
+      };
+    });
   };
 
   const handleChapterContentChange = (chapterId, value) => {
-    setDraft((prev) => ({
-      ...prev,
-      chapters: prev.chapters.map((ch) =>
-        ch.id === chapterId
-          ? { ...ch, content: value, updatedAt: new Date().toISOString() }
-          : ch
-      ),
-    }));
+    setDraft((prev) => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        chapters: (prev.chapters || []).map((ch) =>
+          ch.id === chapterId
+            ? { ...ch, content: value, updatedAt: new Date().toISOString() }
+            : ch
+        ),
+      };
+    });
   };
 
   const handleAddChapter = async () => {
-    const result = await FetchHelper.books.chapters.create({name:"New Chapter"},book.id)
-    setDraft( await normalizeBook(book) )
-
-    /*
-    const id = Date.now().toString();
-    setDraft((prev) => ({
-      ...prev,
-      chapters: [
-        ...prev.chapters,
-        {
-          id: id, index: prev.chapters.length + 1, book_id: prev.id, name: "New chapter", content: "",
-          createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
-        },
-      ],
-    }));
-    setEditExpandedId(id);
-  */
+    const result = await FetchHelper.books.chapters.create({ name: "New Chapter" }, book.id)
+    if (result.ok) {
+      // Reload book data to get the new chapter with proper ID
+      const updatedBook = await normalizeBook(book);
+      setDraft(updatedBook);
+      // Expand the newly created chapter (it will be the last one)
+      if (updatedBook.chapters && updatedBook.chapters.length > 0) {
+        const newChapterId = updatedBook.chapters[updatedBook.chapters.length - 1].id;
+        setEditExpandedId(newChapterId);
+      }
+    }
   };
 
-  const handleRemoveChapter = (chapterId) => {
-    const chapter = draft.chapters.find(chapter => chapter.id === chapterId);
+  const handleRemoveChapter = async (chapterId) => {
+    if (!draft) return;
 
-    const ok = window.confirm(`Delete chapter "${chapter.name}" ? This is irreversible.`);
+    const chapter = draft.chapters?.find(ch => ch.id === chapterId);
+
+    const ok = window.confirm(`Delete chapter "${chapter?.name || chapter?.title || 'Untitled'}" ? This is irreversible.`);
     if (!ok) return;
 
-    setDraft((prev) => ({
-      ...prev,
-      chapters: prev.chapters.filter((ch) => ch.id !== chapterId),
-    }));
-
-    setEditExpandedId((prev) => (prev === chapterId ? null : prev));
+    // Delete from backend
+    try {
+      const result = await FetchHelper.books.chapters.delete(undefined, draft.id, chapterId);
+      if (result.ok) {
+        // Reload book to get updated data
+        const updatedBook = await normalizeBook(book);
+        setDraft(updatedBook);
+        setEditExpandedId((prev) => (prev === chapterId ? null : prev));
+      }
+    } catch (error) {
+      console.error("Error deleting chapter:", error);
+    }
   };
 
   const handleSaveClick = async () => {
-    const updated = {
-      ...draft,
-      name: draft.name,
-      updatedAt: new Date().toISOString(),
-    };
+    if (!draft) return;
 
-    const response = await FetchHelper.books.edit( {
+    // Save book metadata
+    const response = await FetchHelper.books.edit({
       name: draft.name,
       genre: draft.genre,
       description: draft.description
@@ -169,11 +163,39 @@ export default function BookModal({
     console.log("EDIT BOOK RESPONSE")
     console.log(response)
 
+    // Save chapter changes
+    if (Array.isArray(draft.chapters)) {
+      for (const chapter of draft.chapters) {
+        try {
+          if (chapter.id) {
+            // Update existing chapter
+            await FetchHelper.books.chapters.edit(
+              {
+                name: chapter.name || "Untitled",
+                content: chapter.content || ""
+              },
+              draft.id,
+              chapter.id
+            );
+          }
+        } catch (error) {
+          console.error("Error saving chapter:", error);
+        }
+      }
+    }
+
+    // Reload book to get latest data
+    const updatedBook = await normalizeBook(book);
+    const updated = {
+      ...updatedBook,
+      updatedAt: new Date().toISOString(),
+    };
+
     onSave(updated);
   };
 
   // ---------- LOADER ----------
-  if (isLoading) {
+  if (isLoading || !draft) {
     return (
       <div className="bm-overlay">
         <div
@@ -296,7 +318,7 @@ export default function BookModal({
                     <div className="bm-chapter-header">
                       <div className="bm-chapter-index">{idx + 1}</div>
                       <div className="bm-chapter-title">
-                        {ch.title || <em>Untitled chapter</em>}
+                        {ch.name || ch.title || <em>Untitled chapter</em>}
                       </div>
                     </div>
 
@@ -339,7 +361,7 @@ export default function BookModal({
   // =========================================================
   //                      EDIT MODE
   // =========================================================
-  const chapters = draft.chapters;
+  const chapters = draft?.chapters || [];
 
   return (
     <div className="bm-overlay">
@@ -367,7 +389,7 @@ export default function BookModal({
           </div>
           <input
             className="bm-chapter-title-input"
-            value={draft.name}
+            value={draft?.name || ""}
             onChange={handleTitleChange}
             placeholder="Book title"
           />
@@ -387,7 +409,7 @@ export default function BookModal({
           </div>
           <input
             className="bm-chapter-title-input"
-            value={draft.genre}
+            value={draft?.genre || ""}
             onChange={handleGenreChange}
             placeholder="Genre"
           />
@@ -407,15 +429,15 @@ export default function BookModal({
           </div>
           <textarea
             className="bm-chapter-textarea"
-            value={draft.description}
+            value={draft?.description || ""}
             onChange={handleDescChange}
             placeholder="Book description"
-            style={{width:"calc( 100% - 24px )"}}
+            style={{ width: "calc( 100% - 24px )" }}
           />
         </div>
 
         {/* CHAPTERS */}
-        
+
         <h3 style={{ margin: "0 0 10px 0", color: "#e6eef0" }}>Chapters</h3>
 
         {chapters.length === 0 ? (

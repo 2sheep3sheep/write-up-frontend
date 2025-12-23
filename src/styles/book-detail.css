@@ -34,10 +34,22 @@
 }
 
 .chapter-item {
-  background: rgba(255,255,255,0.04);
+  background: rgba(255, 255, 255, 0.04);
   padding: 12px;
   border-radius: 8px;
   margin-bottom: 10px;
+  height: 80px;
+}
+
+.chapter-title {
+  font-size: 30px;
+  margin-bottom: 20px;
+}
+
+.chapter-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
 }
 
 .empty-chapters {
@@ -89,6 +101,12 @@
 .chapter-buttons {
   margin-top: 8px;
   margin-bottom: 8px;
-  display:flex;
+  display: flex;
   gap: 4px;
+}
+
+@media (max-width: 768px) {
+  .chapter-title {
+    margin-top: 0;
+  }
 }

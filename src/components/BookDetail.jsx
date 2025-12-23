@@ -27,7 +27,7 @@ function SimpleChapterModal({ chapter, onClose }) {
 
 export default function BookDetail({
   books = [],
-  setBooks = () => {},
+  setBooks = () => { },
   setScreen,
   readOnly = false, // <<-- важливий прапорець
 }) {
@@ -40,13 +40,16 @@ export default function BookDetail({
   const params = useParams();
   const bookId = params.id;
 
-  const [canEdit,setCanEdit] = useState(false);
+  const [canEdit, setCanEdit] = useState(false);
 
   const loadBook = async () => {
-    const result = await FetchHelper.books.get(undefined,bookId);
+    const result = await FetchHelper.books.get(undefined, bookId);
+
+    console.log("New book: ", result);
+
     if (result.ok) {
       setBook(result.response);
-      if ( result.response.authorId === localStorage.getItem("authorId") ) {
+      if (result.response.authorId === localStorage.getItem("authorId")) {
         setCanEdit(true)
       } else {
         setCanEdit(false)
@@ -56,155 +59,198 @@ export default function BookDetail({
 
   const [book, setBook] = useState()
 
-
   useEffect(() => {
     loadBook();
   }, []);
 
-  const openEditor = (chapter) => {
+  const openEditor = async (chapter) => {
     if (readOnly) return; // в режимі перегляду не відкриваємо редактор
-    setEditorChapter(chapter);
-  };
 
-  const saveChapter = (updated) => {
-    setBooks((prev) =>
-      prev.map((b) => {
-        if (b.id !== id) return b;
+    // Open editor directly for new chapter
+    if (!chapter.id) {
+      setEditorChapter({
+        name: chapter.name ?? "",
+        content: chapter.content ?? "",
+      });
+      return;
+    }
 
-        let chapters = [...(b.chapters || [])];
-
-        if (updated.id) {
-          chapters = chapters.map((c) =>
-            c.id === updated.id
-              ? { ...c, ...updated, lastEdited: new Date().toISOString() }
-              : c
-          );
-        } else {
-          chapters.unshift({
-            ...updated,
-            id: Date.now().toString(),
-            lastEdited: new Date().toISOString(),
-          });
-        }
-
-        return { ...b, chapters, lastEdited: new Date().toISOString() };
-      })
+    // Fetch data for existing chapter
+    const result = await FetchHelper.books.chapters.get(
+      undefined,
+      bookId,
+      chapter.id
     );
 
-    setEditorChapter(null);
+    if (result.ok) {
+      setEditorChapter(result.response);
+    }
   };
 
-  const handleChapterClick = (chapter) => {
-    // в будь-якому режимі при кліку відкриваємо перегляд тексту
-    setOpenedChapter(chapter);
+  // Helper for adding a new chapter
+  const upsertChapter = (chapters, updatedChapter) => {
+    const exists = chapters.some(ch => ch.id === updatedChapter.id);
+    return exists
+      ? chapters.map(ch =>
+        ch.id === updatedChapter.id ? updatedChapter : ch
+      )
+      : [...chapters, updatedChapter];
+  };
+
+  const saveChapter = async (updated) => {
+    try {
+      let chapterId = updated.id;
+
+      if (chapterId) {
+        // Update existing chapter
+        const result = await FetchHelper.books.chapters.edit(
+          {
+            name: updated.title || updated.name || "Untitled",
+            content: updated.content || ""
+          },
+          bookId,
+          updated.id
+        );
+
+        if (!result.ok) return;
+      } else {
+        // Create new chapter
+        const result = await FetchHelper.books.chapters.create(
+          {
+            name: updated.title || updated.name || "New Chapter",
+            content: updated.content || ""
+          },
+          bookId
+        );
+
+        if (!result.ok) return;
+        chapterId = result.response.id;
+      }
+
+      // Fetch full chapter including content
+      const chapterData = await FetchHelper.books.chapters.get(
+        undefined,
+        bookId,
+        chapterId
+      );
+
+      if (chapterData.ok) {
+        setBook(prev => ({
+          ...prev,
+          chapters: upsertChapter(prev.chapters || [], chapterData.response)
+        }));
+      }
+
+      setEditorChapter(null);
+    } catch (error) {
+      console.error("Error saving chapter:", error);
+    }
+  };
+
+  const handleChapterClick = async (chapter) => {
+    const result = await FetchHelper.books.chapters.get(
+      undefined,
+      bookId,
+      chapter.id
+    );
+
+    if (result.ok) {
+      setOpenedChapter(result.response);
+    }
   };
 
   return (
     <div>
-      { !book ?  
-      <div style={{ padding: 20, color: "white" }}>
-        <h1>Book not found</h1>
-        <BackArrow onClick={() => setScreen("/mybooks",-1)}>Back</BackArrow>
-        <PageNavbar />
-      </div>
-      :
-      <div className="book-detail-root">
-        <h1 className="book-title">{book.name}</h1>
-        <p className="book-desc">{book.description}</p>
-
-        <div className="chapter-header">
-          <h2>Chapters</h2>
-
-          {/* КНОПКА ADD CHAPTER – тільки якщо не readOnly */}
-          {!canEdit ? <></> :
-            <button
-              className="add-btn"
-              onClick={() => openEditor({ title: "", content: "" })}
-            >
-              + Add Chapter
-            </button>
-          }
+      {!book ?
+        <div style={{ padding: 20, color: "white" }}>
+          <h1>Book not found</h1>
+          <BackArrow onClick={() => setScreen("/mybooks", -1)}>Back</BackArrow>
+          <PageNavbar />
         </div>
+        :
+        <div className="book-detail-root">
+          <h1 className="book-title">{book.name}</h1>
+          <p className="book-desc">{book.description}</p>
 
-        <div className="chapter-list">
-          {book.chapters?.length ? (
-            book.chapters.map((c) => (
-              <div
-                key={c.id}
-                className="chapter-item"
-                onClick={() => handleChapterClick(c)} // клік = перегляд тексту
+          <div className="chapter-header">
+            <h2>Chapters</h2>
+
+            {/* КНОПКА ADD CHAPTER – тільки якщо не readOnly */}
+            {!canEdit ? <></> :
+              <button
+                className="add-btn"
+                onClick={() => openEditor({ name: "", content: "" })}
               >
-                <div className="chapter-item-header">
-                  <div>
-                    <h3 className="chapter-title">{c.name}</h3>
-                    <div className="chapter-meta">
-                      {c.lastEdited
-                        ? new Date(c.lastEdited).toLocaleString()
-                        : ""}
-                    </div>
-                  </div>
+                + Add Chapter
+              </button>
+            }
+          </div>
 
-                  {/* Кнопка Edit – тільки в режимі редагування */}
-                  
-                     <div className="chapter-buttons">
+          <div className="chapter-list">
+            {book.chapters?.length ? (
+              book.chapters.map((c) => (
+                <div
+                  key={c.id}
+                  className="chapter-item"
+                  onClick={() => handleChapterClick(c)} // клік = перегляд тексту
+                >
+                  <div className="chapter-item-header">
+                    <div>
+                      <h3 className="chapter-title">{c.name}</h3>
+                      <div className="chapter-meta">
+                        {c.lastEdited
+                          ? new Date(c.lastEdited).toLocaleString()
+                          : ""}
+                      </div>
+                    </div>
+
+                    {/* Кнопка Edit – тільки в режимі редагування */}
+
+                    <div className="chapter-buttons">
+                      <button
+                        className="ds-btn ds-btn-primary"
+                      >
+                        View
+                      </button>
+                      {!canEdit ? <></> :
                         <button
-                          className="ds-btn ds-btn-primary"
+                          className="ds-btn ds-btn-secondary"
+                          onClick={(e) => {
+                            e.stopPropagation(); // щоб не спрацьовував відкриття тексту
+                            openEditor(c);
+                          }}
                         >
-                          View
+                          Edit
                         </button>
-                        {!canEdit ? <></> :
-                              <button
-                                className="ds-btn ds-btn-secondary"
-                                onClick={(e) => {
-                                  e.stopPropagation(); // щоб не спрацьовував відкриття тексту
-                                  openEditor(c);
-                                }}
-                              >
-                                Edit
-                              </button>
-                        }
+                      }
                     </div>
-                </div>
-
-                {/* У режимі перегляду – НЕ показуємо контент взагалі, тільки заголовок.
-                    У режимі редагування можемо залишити короткий preview або теж сховати. */}
-                
-                  <div className="chapter-content-preview">
-                    {c.content ? (
-                      c.content.length > 180
-                        ? c.content.slice(0, 180) + "…"
-                        : c.content
-                    ) : (
-                      <em>No content</em>
-                    )}
                   </div>
-                
-              </div>
-            ))
-          ) : (
-            <div className="empty-chapters">No chapters yet</div>
+                </div>
+              ))
+            ) : (
+              <div className="empty-chapters">No chapters yet</div>
+            )}
+          </div>
+
+          <PageNavbar />
+
+          {/* Модалка редагування – тільки коли не readOnly */}
+          {!readOnly && editorChapter && (
+            <ChapterEditorModal
+              chapter={editorChapter}
+              onClose={() => setEditorChapter(null)}
+              onSave={saveChapter}
+            />
+          )}
+
+          {/* Модалка перегляду тексту глави – працює в обох режимах */}
+          {openedChapter && (
+            <SimpleChapterModal
+              chapter={openedChapter}
+              onClose={() => setOpenedChapter(null)}
+            />
           )}
         </div>
-
-        <PageNavbar />
-
-        {/* Модалка редагування – тільки коли не readOnly */}
-        {!readOnly && editorChapter && (
-          <ChapterEditorModal
-            chapter={editorChapter}
-            onClose={() => setEditorChapter(null)}
-            onSave={saveChapter}
-          />
-        )}
-
-        {/* Модалка перегляду тексту глави – працює в обох режимах */}
-        {openedChapter && (
-          <SimpleChapterModal
-            chapter={openedChapter}
-            onClose={() => setOpenedChapter(null)}
-          />
-        )}
-      </div>
       }
     </div>
   );

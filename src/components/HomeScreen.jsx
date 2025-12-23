@@ -28,24 +28,29 @@ export default function HomeScreen({
     const [createOpen, setCreateOpen] = useState(false);
     const [recentBooks, setRecentBooks] = useState([]);
     const [stats, setStats] = useState([
-        { label: "My Books", value: 0, icon: "book", color: "#4da3ff" },
-        { label: "Total Chapters", value: 0, icon: "file", color: "#7c3aed" },
+        { label: "No.of Books", value: 0, icon: "book", color: "#4da3ff" },
+        { label: "No. of Genres", value: 0, icon: "file", color: "#ecb43aff" },
     ]);
     const [error, setError] = useState(null);
     const [bookList, setBookList] = useState([]);
     const [openBook, setOpenBook] = useState(null);
     const [modalMode, setModalMode] = useState("view");
 
-    const isAuthor = localStorage.getItem("authorId") !== "null";
+    const isAuthor = localStorage.getItem("authorId") !== "null" && localStorage.getItem("authorId") !== null;
 
     const loadBooks = async (sourceBooks) => {
 
         // Fetch books online
         sourceBooks = [];
-        sourceBooks = await fetchClientBooks()
-        
+        // Use fetchBooks for readers, fetchClientBooks for authors
+        if (isAuthor) {
+            sourceBooks = await fetchClientBooks();
+        } else {
+            sourceBooks = await fetchBooks();
+        }
 
-        setBookList(sourceBooks);
+
+        setBookList(Array.isArray(sourceBooks) ? sourceBooks : []);
 
         setBookListCall({ state: "pending" });
         setError(null);
@@ -63,18 +68,23 @@ export default function HomeScreen({
             }
             */
 
-            sb = sb.sort( (a,b) => { return new Date(b.updatedAt) - new Date(a.updatedAt) } )
+            sb = sb.sort((a, b) => { return new Date(b.updatedAt) - new Date(a.updatedAt) })
 
             const recent = Array.isArray(sb) ? sb.slice(0, 3) : [];
             const booksCount = Array.isArray(sb) ? sb.length : 0;
-            const chaptersCount = Array.isArray(sb)
-                ? sb.reduce((sum, b) => sum + (Array.isArray(b.chapters) ? b.chapters.length : 0), 0)
-                : 0;
+
+            let genres = new Set();
+
+            for (let book of sb) {
+                genres.add(book.genre)
+            }
+
+            const genresCount = genres.size;
 
             setRecentBooks(recent);
             setStats([
-                { label: "My Books", value: booksCount, icon: "book", color: "#4da3ff" },
-                { label: "Total Chapters", value: chaptersCount, icon: "file", color: "#7c3aed" },
+                { label: "No. of Books", value: booksCount, icon: "book", color: "#4da3ff" },
+                { label: "No. of Genres", value: genresCount, icon: "file", color: "#ecb43aff" },
             ]);
             setBookListCall({ state: "success" });
         } catch (err) {
@@ -83,9 +93,9 @@ export default function HomeScreen({
             setBookListCall({ state: "error" });
         }
     };
-  
 
-  useEffect(() => {
+
+    useEffect(() => {
         loadBooks(books);
     }, [books]);
 
@@ -94,7 +104,7 @@ export default function HomeScreen({
         setModalMode("view");
     };
 
-  const handleLogout = () => {
+    const handleLogout = () => {
         setLogoutCall({ state: "pending" });
         setTimeout(() => {
             setLogoutCall({ state: "success" });
@@ -102,7 +112,7 @@ export default function HomeScreen({
             removeLocalSessionData();
         }, 700);
     };
-    
+
     return (
         <div className="home-root">
             <header className="home-header">
@@ -147,7 +157,7 @@ export default function HomeScreen({
                                 {stats.map((s) => (
                                     <div key={s.label} className="stat-card" role="region" aria-label={s.label}>
                                         <div className="stat-icon" style={{ backgroundColor: hexToRgba(s.color, 0.12), color: s.color }}>
-                                            {s.icon === "book" ? "📘" : "📄"}
+                                            {s.icon === "book" ? "📘" : "🏷️"}
                                         </div>
                                         <div className="stat-value">{s.value}</div>
                                         <div className="stat-label">{s.label}</div>
@@ -182,8 +192,6 @@ export default function HomeScreen({
                                                 <div className="recent-meta">
                                                     <span>{b.genre}</span>
                                                     <span> • </span>
-                                                    <span>{Array.isArray(b.chapters) ? b.chapters.length : 0} chapters</span>
-                                                    <span> • </span>
                                                     <span>⏱ {b.updatedAt || "—"}</span>
                                                 </div>
                                             </div>
@@ -215,7 +223,12 @@ export default function HomeScreen({
                                     <div className="book-card" key={b.id}>
                                         <div className="book-title">{b.name}</div>
                                         <div className="book-meta">
-                                            Genre: {b.genre} · Chapters: {Array.isArray(b.chapters) ? b.chapters.length : 0} · Last edited: {b.updatedAt ? new Date(b.updatedAt).toLocaleString() : "—"}
+                                            <div>
+                                                Genre: {b.genre}
+                                            </div>
+                                            <div>
+                                                Last edited: {b.updatedAt ? new Date(b.updatedAt).toLocaleString() : "—"}
+                                            </div>
                                         </div>
 
                                         <div className="book-actions">

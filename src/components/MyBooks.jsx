@@ -32,11 +32,13 @@ export default function MyBooks({
   const filteredBooks = list.filter(b =>
     b.title.toLowerCase().includes(search.toLowerCase())
   );*/
-  
+
   const books = []
 
   const loadBooks = async () => {
-    setList(await fetchClientBooks())
+    const fetched = await fetchClientBooks();
+    const booksArray = Array.isArray(fetched) ? fetched : [];
+    setList(booksArray);
   }
 
   useEffect(() => {
@@ -46,7 +48,10 @@ export default function MyBooks({
 
   useEffect(() => {
     localStorage.setItem("mybooks", JSON.stringify(list));
-    if (typeof setBooks === "function") setBooks(list);
+    // Move setBooks to avoid setState during render
+    if (typeof setBooks === "function") {
+      setTimeout(() => setBooks(list), 0);
+    }
   }, [list]);
 
   useEffect(() => {
@@ -56,14 +61,14 @@ export default function MyBooks({
   const [createOpen, setCreateOpen] = useState(false);
   const [openBook, setOpenBook] = useState(null);
   const [modalMode, setModalMode] = useState("view");
-  
+
 
   const openView = (book) => {
     /*
     setOpenBook(book);
     setModalMode("view");
     */
-    setScreen(`book/${book.id}`,1)
+    setScreen(`book/${book.id}`, 1)
   };
 
   const openEdit = (book) => {
