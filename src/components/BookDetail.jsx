@@ -5,6 +5,7 @@ import "../styles/book-detail.css";
 import ChapterEditorModal from "./ChapterEditorModal";
 import FetchHelper from "../fetchHelper";
 import BackArrow from "./generic/BackArrow";
+import Chapter from "./Chapter";
 
 // якщо у тебе вже є свій ChapterModal – можеш використати його
 function SimpleChapterModal({ chapter, onClose }) {
@@ -28,14 +29,12 @@ function SimpleChapterModal({ chapter, onClose }) {
 export default function BookDetail({
   books = [],
   setBooks = () => { },
-  setScreen,
+  setScreen = () => { },
   readOnly = false, // <<-- важливий прапорець
 }) {
-  const navigate = useNavigate();
-
-
   const [editorChapter, setEditorChapter] = useState(null);
   const [openedChapter, setOpenedChapter] = useState(null); // для перегляду тексту
+  const [detailCall, setDetailCall] = useState("inactive");
 
   const params = useParams();
   const bookId = params.id;
@@ -43,17 +42,25 @@ export default function BookDetail({
   const [canEdit, setCanEdit] = useState(false);
 
   const loadBook = async () => {
-    const result = await FetchHelper.books.get(undefined, bookId);
+    setDetailCall("pending");
 
-    console.log("New book: ", result);
+    try {
+      const result = await FetchHelper.books.get(undefined, bookId);
 
-    if (result.ok) {
-      setBook(result.response);
-      if (result.response.authorId === localStorage.getItem("authorId")) {
-        setCanEdit(true)
+      if (result.ok) {
+        setDetailCall("success");
+        setBook(result.response);
+        if (result.response.authorId === localStorage.getItem("authorId")) {
+          setCanEdit(true)
+        } else {
+          setCanEdit(false)
+        }
       } else {
-        setCanEdit(false)
+        setDetailCall("error");
       }
+    } catch (e) {
+      console.error(e);
+      setDetailCall("error");
     }
   }
 
@@ -155,13 +162,13 @@ export default function BookDetail({
     );
 
     if (result.ok) {
-      setOpenedChapter(result.response);
+      setScreen(`book/${bookId}/chapter/${chapter.id}`, 1)
     }
   };
 
   return (
     <div>
-      {!book ?
+      {!book && detailCall !== "pending" ?
         <div style={{ padding: 20, color: "white" }}>
           <h1>Book not found</h1>
           <BackArrow onClick={() => setScreen("/mybooks", -1)}>Back</BackArrow>
@@ -169,8 +176,8 @@ export default function BookDetail({
         </div>
         :
         <div className="book-detail-root">
-          <h1 className="book-title">{book.name}</h1>
-          <p className="book-desc">{book.description}</p>
+          <h1 className="book-title">{book?.name}</h1>
+          <p className="book-desc">{book?.description}</p>
 
           <div className="chapter-header">
             <h2>Chapters</h2>
@@ -187,7 +194,7 @@ export default function BookDetail({
           </div>
 
           <div className="chapter-list">
-            {book.chapters?.length ? (
+            {book?.chapters?.length ? (
               book.chapters.map((c) => (
                 <div
                   key={c.id}

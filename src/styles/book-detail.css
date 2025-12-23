@@ -18,6 +18,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-size: 15px;
 }
 
 .add-btn {
@@ -42,7 +43,7 @@
 }
 
 .chapter-title {
-  font-size: 30px;
+  font-size: 25px;
   margin-bottom: 20px;
 }
 

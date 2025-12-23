@@ -2,44 +2,49 @@ import { ClipLoader } from "react-spinners";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import BackArrow from "./generic/BackArrow";
+import FetchHelper from "../fetchHelper";
+import Avatar from "@mui/material/Avatar";
 import "../styles/chapter.css";
 
-function Chapter({ books, setScreen, fetchBooks }) {
+function Chapter({ setScreen }) {
     const [chapterCall, setChapterCall] = useState("inactive");
     const [chapterData, setChapterData] = useState(null);
-    const [bookData, setBookData] = useState(null);
 
     const params = useParams();
-    const chapterId = params.id;
+    const bookId = params.bookId;
+    const chapterId = params.chapterId;
 
-    // Helper to find chapter in a books list
-    const findChapterInBooks = (booksList) => {
-        if (!Array.isArray(booksList)) return null;
-        for (const b of booksList) {
-            if (Array.isArray(b.chapters)) {
-                const ch = b.chapters.find((c) => c.id === chapterId);
-                if (ch) return { book: b, chapter: ch };
-            }
+    const commentList = [
+        {
+            id: "1",
+            username: "Jirka",
+            content: "Super kapitola bro 🔥"
+        },
+        {
+            id: "2",
+            username: "Oleksandr",
+            content: "Je to top 👍"
+        },
+        {
+            id: "3",
+            username: "Honza",
+            content: "Jen tak dál 🙌"
         }
-        return null;
-    };
+    ]
 
     const loadChapter = async () => {
         setChapterCall("pending");
 
         try {
-            // Try finding the chapter in books prop
-            let result = findChapterInBooks(books);
-
-            // Fetch books if not found
-            if (!result) {
-                const fetchedBooks = await fetchBooks();
-                result = findChapterInBooks(fetchedBooks);
-            }
+            const result = await FetchHelper.books.chapters.get(
+                undefined,
+                bookId,
+                chapterId
+            )
 
             if (result) {
-                setBookData(result.book);
-                setChapterData(result.chapter);
+                setChapterData(result.response);
+                console.log(result.response)
                 setChapterCall("success");
             } else {
                 setChapterCall("error");
@@ -61,7 +66,7 @@ function Chapter({ books, setScreen, fetchBooks }) {
             <div className="chapter-root">
                 <header className="chapter-header">
                     <div className="header-left">
-                        <BackArrow onClick={() => setScreen("/home", -1)} />
+                        <BackArrow onClick={() => setScreen(`/book/${bookId}`, -1)} />
                     </div>
                     <div className="header-center">
                         <h1 className="chapter-title">Loading...</h1>
@@ -85,12 +90,12 @@ function Chapter({ books, setScreen, fetchBooks }) {
     }
 
     // Error
-    if (chapterCall === "error" || !chapterData) {
+    if (!chapterData) {
         return (
             <div className="chapter-root">
                 <header className="chapter-header">
                     <div className="header-left">
-                        <BackArrow onClick={() => setScreen("/home", -1)} />
+                        <BackArrow onClick={() => setScreen(`/book/${bookId}`, -1)} />
                     </div>
                     <div className="header-center">
                         <h1 className="chapter-title">Chapter Not Found</h1>
@@ -108,19 +113,6 @@ function Chapter({ books, setScreen, fetchBooks }) {
                         marginTop: 50,
                     }}
                 >
-                    <button
-                        onClick={() => setScreen("/home", -1)}
-                        style={{
-                            padding: "10px 20px",
-                            backgroundColor: "var(--accent)",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "5px",
-                            cursor: "pointer",
-                        }}
-                    >
-                        Go Back Home
-                    </button>
                 </div>
             </div>
         );
@@ -131,11 +123,11 @@ function Chapter({ books, setScreen, fetchBooks }) {
         <div className="chapter-root">
             <header className="chapter-header">
                 <div className="header-left">
-                    <BackArrow onClick={() => setScreen("/home", -1)} />
+                    <BackArrow onClick={() => setScreen(`/book/${bookId}`, -1)} />
                 </div>
                 <div className="header-center">
                     <h1 className="chapter-title">
-                        Chapter {chapterData.index} - {chapterData.name}
+                        {chapterData.name}
                     </h1>
                 </div>
                 <div className="header-right" />
@@ -151,6 +143,26 @@ function Chapter({ books, setScreen, fetchBooks }) {
                         className="chapter-content"
                     >
                         {chapterData.content}
+                    </div>
+                    <div className="comment-header">
+                        <h2>
+                            Comments
+                        </h2>
+                    </div>
+                    <div style={{ marginBottom: 30 }}>
+                        {commentList.map(comment =>
+                            <div className="comment" key={comment.id}>
+                                <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 10 }}>
+                                    <Avatar sx={{ bgcolor: "white", color: "black" }}>{comment.username.slice(0, 1)}</Avatar>
+                                    <div>
+                                        <b>{comment.username}</b>
+                                    </div>
+                                </div>
+                                <div>
+                                    {comment.content}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

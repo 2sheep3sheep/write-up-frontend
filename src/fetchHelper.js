@@ -76,6 +76,12 @@ const FetchHelper = {
             list: async (dtoIn, bookId) => Call(baseUri, `books/${bookId}/chapters`, dtoIn, "get"),
             edit: async (dtoIn, bookId, chapterId) => Call(baseUri, `books/${bookId}/chapters/${chapterId}`, dtoIn, "patch"),
             delete: async (dtoIn, bookId, chapterId) => Call(baseUri, `books/${bookId}/chapters/${chapterId}`, dtoIn, "delete"),
+
+            comments: {
+                create: async (dtoIn, bookId, chapterId) => Call(baseUri, `books/${bookId}/chapters/${chapterId}/comments`, dtoIn, "post"),
+                list: async (dtoIn, bookId, chapterId) => Call(baseUri, `books/${bookId}/chapters/${chapterId}/comments`, dtoIn, "get"),
+                delete: async (dtoIn, bookId, chapterId, commentId) => Call(baseUri, `books/${bookId}/chapters/${chapterId}/comments/${commentId}`, dtoIn, "delete")
+            }
         }
     },
     profile: {

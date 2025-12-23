@@ -163,6 +163,7 @@ export default function MyBooks({
           onEdit={openEdit}
           search={search}
           onDelete={handleDelete}
+          setScreen={setScreen}
         />
       </main>
 

@@ -233,7 +233,6 @@ export default function App() {
                   setScreen={navTo}
                   onCreateBook={handleCreateBook}
                   onViewMyBooks={() => navTo("mybooks", 1)}
-                  onViewChapter={(id) => navTo(`/chapter/${id}`, 1)}
                   books={books}
                   setBooks={setBooks}
                   fetchBooks={fetchBooks}
@@ -256,13 +255,12 @@ export default function App() {
                   setBooks={setBooks}
                   setScreen={navTo}
                   handleCreateBook={handleCreateBook}
-                  onViewChapter={(id) => navTo(`/chapter/${id}`, 1)}
                   fetchBooks={fetchBooks}
                   fetchClientBooks={fetchClientBooks} />
               </motion.div>
             } />
 
-          <Route path="/chapter/:id"
+          <Route path="/book/:bookId/chapter/:chapterId"
             element={
               <motion.div
                 animate={animationStateController()}
@@ -271,7 +269,7 @@ export default function App() {
                 style={{ width: '100%' }}
               >
 
-                <Chapter books={books} setScreen={navTo} fetchBooks={fetchBooks} />
+                <Chapter setScreen={navTo} />
               </motion.div>
             } />
 

@@ -244,7 +244,6 @@ export default function HomeScreen({
                         book={openBook}
                         mode={modalMode}
                         onClose={() => setOpenBook(null)}
-                        onViewChapter={onViewChapter}
                     />
                 </div>}
         </div>

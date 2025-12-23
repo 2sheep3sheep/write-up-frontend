@@ -55,6 +55,22 @@
     margin-bottom: 50px;
 }
 
+.comment-header {
+    padding: 0 20px 20px;
+    margin-top: -10px;
+}
+
+.comment {
+    background: rgba(255, 255, 255, 0.04);
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
 @media (max-width: 768px) {
     .chapter-title {
         font-size: 28px;
