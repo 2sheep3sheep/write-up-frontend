@@ -171,6 +171,9 @@ export default function BookDetail({
         </div>
         :
         <div className="book-detail-root">
+
+          <BackArrow style={{left:"0px", marginBottom:"24px"}} onClick={ () => {canEdit ? setScreen("/mybooks", -1) : setScreen("/home", -1) } }>Back</BackArrow>
+
           <h1 className="book-title">{book.name}</h1>
           <p className="book-desc">{book.description}</p>
 
@@ -218,7 +221,7 @@ export default function BookDetail({
                           }
                         }
                       >
-                        View
+                        Read
                       </button>
                       {!canEdit ? <></> :
                         <button
