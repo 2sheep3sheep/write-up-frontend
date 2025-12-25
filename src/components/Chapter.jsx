@@ -5,6 +5,7 @@ import BackArrow from "./generic/BackArrow";
 import FetchHelper from "../fetchHelper";
 import Avatar from "@mui/material/Avatar";
 import TextField from "@mui/material/TextField";
+import ConfirmDeleteCommentModal from "./ConfirmDeleteCommentModal";
 import "../styles/chapter.css";
 
 function Chapter({ setScreen }) {
@@ -36,6 +37,7 @@ function Chapter({ setScreen }) {
     ]);
 
     const [newCommentText, setNewCommentText] = useState("");
+    const [commentToDelete, setCommentToDelete] = useState(null);
 
     const handleAddComment = () => {
         const username = localStorage.getItem("username");
@@ -48,6 +50,13 @@ function Chapter({ setScreen }) {
 
         setComments(prev => [newComment, ...prev]);
         setNewCommentText("");
+    };
+
+    const handleDeleteComment = (id) => {
+        const updatedComments = comments.filter(comment => comment.id !== id);
+
+        setComments(updatedComments);
+        setCommentToDelete(null);
     };
 
     const loadChapter = async () => {
@@ -138,74 +147,89 @@ function Chapter({ setScreen }) {
 
     // Success state
     return (
-        <div className="chapter-root">
-            <header className="chapter-header">
-                <div className="header-left">
-                    <BackArrow onClick={() => setScreen(`/book/${bookId}`, -1)} />
-                </div>
-                <div className="header-center">
-                    <h1 className="chapter-title">
-                        {chapterData.name}
-                    </h1>
-                </div>
-                <div className="header-right" />
-            </header>
-            <div>
-                <div style={{ position: "absolute", left: "10%", right: "10%" }}>
-                    <div
-                        style={{
-                            display: "flex",
-                            justifyContent: "left",
-                            marginTop: 30,
-                        }}
-                        className="chapter-content"
-                    >
-                        {chapterData.content}
+        <>
+            <div className="chapter-root">
+                <header className="chapter-header">
+                    <div className="header-left">
+                        <BackArrow onClick={() => setScreen(`/book/${bookId}`, -1)} />
                     </div>
-                    <div className="comment-header">
-                        <h2>Comments</h2>
-
-                        {!isAuthor && (
-                            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                                <TextField
-                                    multiline
-                                    fullWidth
-                                    variant="filled"
-                                    label="Write a comment"
-                                    maxRows={4}
-                                    value={newCommentText}
-                                    onChange={(e) => setNewCommentText(e.target.value)}
-                                    style={{ backgroundColor: "white" }}
-                                />
-
-                                <button
-                                    className="ds-btn ds-btn-primary"
-                                    onClick={handleAddComment}
-                                    style={{ alignSelf: "flex-end" }}
-                                >
-                                    Post comment
-                                </button>
-                            </div>
-                        )}
+                    <div className="header-center">
+                        <h1 className="chapter-title">
+                            {chapterData.name}
+                        </h1>
                     </div>
-                    <div style={{ marginBottom: 30 }}>
-                        {comments.map(comment =>
-                            <div className="comment" key={comment.id}>
-                                <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 10 }}>
-                                    <Avatar sx={{ bgcolor: "white", color: "black" }}>{comment.username.slice(0, 1)}</Avatar>
+                    <div className="header-right" />
+                </header>
+                <div>
+                    <div style={{ position: "absolute", left: "10%", right: "10%" }}>
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "left",
+                                marginTop: 30,
+                            }}
+                            className="chapter-content"
+                        >
+                            {chapterData.content}
+                        </div>
+                        <div className="comment-header">
+                            <h2>Comments</h2>
+
+                            {!isAuthor && (
+                                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                                    <TextField
+                                        multiline
+                                        fullWidth
+                                        variant="filled"
+                                        label="Write a comment"
+                                        maxRows={4}
+                                        value={newCommentText}
+                                        onChange={(e) => setNewCommentText(e.target.value)}
+                                        style={{ backgroundColor: "white" }}
+                                    />
+
+                                    <button
+                                        className="ds-btn ds-btn-primary"
+                                        onClick={handleAddComment}
+                                        style={{ alignSelf: "flex-end" }}
+                                    >
+                                        Post comment
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                        <div style={{ marginBottom: 30 }}>
+                            {comments.map(comment =>
+                                <div className="comment" key={comment.id}>
+                                    <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
+                                        <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 10 }}>
+                                            <Avatar sx={{ bgcolor: "white", color: "black" }}>{comment.username.slice(0, 1)}</Avatar>
+                                            <div>
+                                                <b>{comment.username}</b>
+                                            </div>
+                                        </div>
+                                        {comment.username === localStorage.getItem("username") &&
+                                            <div style={{ margin: 10 }}>
+                                                <button className="ds-btn ds-btn-danger" onClick={() => setCommentToDelete(comment)}>Delete</button>
+                                            </div>
+                                        }
+                                    </div>
                                     <div>
-                                        <b>{comment.username}</b>
+                                        {comment.text}
                                     </div>
                                 </div>
-                                <div>
-                                    {comment.text}
-                                </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+
+            <ConfirmDeleteCommentModal
+                commentToDelete={commentToDelete}
+                setCommentToDelete={setCommentToDelete}
+                onDelete={() => handleDeleteComment(commentToDelete.id)}
+            />
+        </>
     );
 }
 

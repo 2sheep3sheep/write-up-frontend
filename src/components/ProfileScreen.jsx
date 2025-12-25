@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PageNavbar from "./generic/PageNavbar.jsx";
 import { getProfile, updateProfile } from "../services/profileService.jsx";
+import "../styles/profile.css";
 
 function validate(form) {
   const errors = {};
@@ -123,131 +124,15 @@ export default function ProfileScreen() {
     setForm((prev) => ({ ...prev, avatarDataUrl: dataUrl }));
   }
 
-  // ===== UI styles (matching your app feel + keeps background consistent) =====
-  const page = {
-    minHeight: "100vh",
-    padding: "22px 18px 140px", // space for bottom navbar
-    color: "#fff",
-    background: "var(--app-bg, #1b3b53)" // SAME background across pages if you define --app-bg globally
-  };
-
-  const topBar = {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 12,
-    marginBottom: 10
-  };
-
-  const backBtn = {
-    padding: "10px 12px",
-    borderRadius: 14,
-    border: "1px solid rgba(255,255,255,0.10)",
-    background: "rgba(255,255,255,0.04)",
-    color: "#fff",
-    cursor: "pointer",
-    fontWeight: 800
-  };
-
-  const title = { fontSize: 40, fontWeight: 900, margin: "10px 0 18px", letterSpacing: -0.4 };
-  const sectionTitle = { fontSize: 20, fontWeight: 900, margin: "18px 0 12px" };
-
-  const panel = {
-    background: "rgba(6, 38, 61, 0.70)",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 18,
-    padding: 16,
-    boxShadow: "0 10px 26px rgba(0,0,0,0.25)"
-  };
-
-  const inputLike = {
-    width: "100%",
-    padding: "14px 16px",
-    borderRadius: 16,
-    border: "1px solid rgba(255,255,255,0.12)",
-    background: "rgba(255,255,255,0.05)",
-    color: "#fff",
-    outline: "none",
-    fontSize: 16
-  };
-
-  const label = { fontSize: 16, fontWeight: 900, margin: "18px 0 10px" };
-  const error = { color: "rgba(255,140,140,0.95)", fontSize: 13, marginTop: 8 };
-
-  const avatarWrap = {
-    width: 74,
-    height: 74,
-    borderRadius: "999px",
-    border: "2px solid rgba(46, 126, 183, 0.55)",
-    display: "grid",
-    placeItems: "center",
-    overflow: "hidden",
-    background: "rgba(0,0,0,0.15)",
-    boxShadow: "0 10px 18px rgba(0,0,0,0.25)"
-  };
-
-  const primaryBig = {
-    width: "100%",
-    padding: "16px 18px",
-    borderRadius: 18,
-    border: "none",
-    background: "#ffffff",
-    color: "#0b2540",
-    fontSize: 18,
-    fontWeight: 900,
-    cursor: "pointer",
-    marginTop: 18,
-    boxShadow: "0 14px 24px rgba(0,0,0,0.28)"
-  };
-
-  const uploadBtn = {
-    width: "100%",
-    padding: "16px 18px",
-    borderRadius: 18,
-    border: "1px solid rgba(255,255,255,0.12)",
-    background: "rgba(255,255,255,0.04)",
-    color: "#a8d7ff",
-    fontSize: 18,
-    fontWeight: 900,
-    cursor: "pointer"
-  };
-
-  const btnRow = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginTop: 18 };
-
-  const cancelBtn = {
-    padding: "16px 18px",
-    borderRadius: 18,
-    border: "1px solid rgba(255,80,80,0.35)",
-    background: "rgba(255, 68, 68, 0.16)",
-    color: "#ffd6d6",
-    fontSize: 18,
-    fontWeight: 900,
-    cursor: "pointer"
-  };
-
-  const confirmBtn = {
-    padding: "16px 18px",
-    borderRadius: 18,
-    border: "none",
-    background: "#ffffff",
-    color: "#0b2540",
-    fontSize: 18,
-    fontWeight: 900,
-    cursor: "pointer",
-    boxShadow: "0 14px 24px rgba(0,0,0,0.28)"
-  };
-
-  const disabledStyle = { opacity: 0.65, cursor: "not-allowed" };
-
   if (loading) {
     return (
-      <div style={page}>
-        <div style={topBar}>
-          <button style={backBtn} onClick={() => navigate("/home")}>Back</button>
+      <div className="page">
+        <div className="top-bar">
+          <button className="back-btn" onClick={() => navigate("/home")}>Back</button>
           <div style={{ opacity: 0.65, fontWeight: 800 }}>Profile</div>
         </div>
-        <div style={title}>Author's profile</div>
-        <div style={panel}>Loading...</div>
+        <div className="title">Author's profile</div>
+        <div className="panel">Loading...</div>
         <PageNavbar />
       </div>
     );
@@ -256,17 +141,17 @@ export default function ProfileScreen() {
   // ===== VIEW MODE =====
   if (!isEditing) {
     return (
-      <div style={page}>
-        <div style={topBar}>
-          <button style={backBtn} onClick={() => navigate("/home")}>Back</button>
+      <div className="page">
+        <div className="top-bar">
+          <button className="back-btn" onClick={() => navigate("/home")}>Back</button>
           <div style={{ opacity: 0.65, fontWeight: 800 }}>Profile</div>
         </div>
 
-        <div style={title}>Author's profile</div>
+        <div className="title">Author's profile</div>
 
-        <div style={sectionTitle}>Personal information</div>
-        <div style={{ ...panel, display: "flex", gap: 14, alignItems: "center" }}>
-          <div style={avatarWrap}>
+        <div className="section-title">Personal information</div>
+        <div className="panel" style={{ display: "flex", gap: 14, alignItems: "center" }}>
+          <div className="avatar-wrap">
             {profile?.avatarDataUrl ? (
               <img
                 src={profile.avatarDataUrl}
@@ -284,19 +169,19 @@ export default function ProfileScreen() {
           </div>
         </div>
 
-        <div style={sectionTitle}>Contact</div>
-        <div style={panel}>
-          <div style={inputLike}>{profile?.email}</div>
+        <div className="section-title">Contact</div>
+        <div className="panel">
+          <div className="input-like">{profile?.email}</div>
         </div>
 
-        <div style={sectionTitle}>Bio</div>
-        <div style={panel}>
-          <div style={{ ...inputLike, minHeight: 130, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>
+        <div className="section-title">Bio</div>
+        <div className="panel">
+          <div className="input-like" style={{ minHeight: 130, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>
             {profile?.bio}
           </div>
         </div>
 
-        <button style={primaryBig} onClick={startEdit}>
+        <button className="primary-big" onClick={startEdit}>
           Edit Profile
         </button>
 
@@ -307,37 +192,40 @@ export default function ProfileScreen() {
 
   // ===== EDIT MODE =====
   return (
-    <div style={page}>
-      <div style={topBar}>
-        <button style={{ ...backBtn, ...(saving ? disabledStyle : {}) }} onClick={cancelEdit} disabled={saving}>
+    <div className="page">
+      <div className="top-bar">
+        <button className="back-btn" style={saving ? {
+          opacity: 0.65,
+          cursor: "not-allowed"
+        } : {}} onClick={cancelEdit} disabled={saving}>
           Back
         </button>
         <div style={{ opacity: 0.65, fontWeight: 800 }}>Edit</div>
       </div>
 
-      <div style={title}>Edit author's profile</div>
+      <div className="title">Edit author's profile</div>
 
-      <div style={label}>Name</div>
+      <div className="label">Name</div>
       <input
         name="name"
         value={form.name}
         onChange={onChange}
         onBlur={onBlur}
-        style={inputLike}
+        className="input-like"
         placeholder="Name"
       />
-      {touched.name && errors.name ? <div style={error}>{errors.name}</div> : null}
+      {touched.name && errors.name ? <div className="error">{errors.name}</div> : null}
 
-      <div style={label}>Email</div>
+      <div className="label">Email</div>
       <input
         name="email"
         value={form.email}
         onChange={onChange}
         onBlur={onBlur}
-        style={inputLike}
+        className="input-like"
         placeholder="Email"
       />
-      {touched.email && errors.email ? <div style={error}>{errors.email}</div> : null}
+      {touched.email && errors.email ? <div className="error">{errors.email}</div> : null}
 
       <div style={{ marginTop: 18 }}>
         <input
@@ -350,7 +238,10 @@ export default function ProfileScreen() {
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          style={{ ...uploadBtn, ...(saving ? disabledStyle : {}) }}
+          className="upload-btn" style={saving ? {
+            opacity: 0.65,
+            cursor: "not-allowed"
+          } : {}}
           disabled={saving}
         >
           Upload image
@@ -358,7 +249,7 @@ export default function ProfileScreen() {
 
         {form.avatarDataUrl ? (
           <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
-            <div style={avatarWrap}>
+            <div className="avatar-wrap">
               <img
                 src={form.avatarDataUrl}
                 alt="preview"
@@ -377,7 +268,10 @@ export default function ProfileScreen() {
                 color: "#fff",
                 cursor: "pointer",
                 fontWeight: 900,
-                ...(saving ? disabledStyle : {})
+                ...(saving ? {
+                  opacity: 0.65,
+                  cursor: "not-allowed"
+                } : {})
               }}
               disabled={saving}
             >
@@ -387,23 +281,30 @@ export default function ProfileScreen() {
         ) : null}
       </div>
 
-      <div style={label}>Bio</div>
+      <div className="label">Bio</div>
       <textarea
         name="bio"
         value={form.bio}
         onChange={onChange}
         onBlur={onBlur}
         rows={6}
-        style={{ ...inputLike, resize: "none" }}
+        className="input-like"
+        style={{ resize: "none" }}
         placeholder="Bio"
       />
       <div style={{ opacity: 0.6, fontSize: 12, marginTop: 8 }}>{(form.bio || "").length}/800</div>
-      {touched.bio && errors.bio ? <div style={error}>{errors.bio}</div> : null}
+      {touched.bio && errors.bio ? <div className="error">{errors.bio}</div> : null}
 
-      <div style={btnRow}>
+      <div className="btn-row">
         <button
           type="button"
-          style={{ ...cancelBtn, ...(saving ? disabledStyle : {}) }}
+          className="cancel-btn"
+          style={{
+            ...(saving ? {
+              opacity: 0.65,
+              cursor: "not-allowed"
+            } : {})
+          }}
           onClick={cancelEdit}
           disabled={saving}
         >
@@ -412,7 +313,13 @@ export default function ProfileScreen() {
 
         <button
           type="button"
-          style={{ ...confirmBtn, ...(saving ? disabledStyle : {}) }}
+          className="confirm-btn"
+          style={{
+            ...(saving ? {
+              opacity: 0.65,
+              cursor: "not-allowed"
+            } : {})
+          }}
           onClick={confirmEdit}
           disabled={saving}
         >

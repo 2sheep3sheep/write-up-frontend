@@ -24,9 +24,7 @@ export default function MyBooks({
     }
   });
 
-
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("");
 
   /* 
   const filteredBooks = list.filter(b =>
@@ -61,7 +59,7 @@ export default function MyBooks({
   const [createOpen, setCreateOpen] = useState(false);
   const [openBook, setOpenBook] = useState(null);
   const [modalMode, setModalMode] = useState("view");
-
+  const [bookToDelete, setBookToDelete] = useState(null);
 
   const openView = (book) => {
     /*
@@ -119,10 +117,6 @@ export default function MyBooks({
 
   // --- NEW: delete handler ---
   const handleDelete = async (id) => {
-    const book = list.find(b => b.id === id);
-    const ok = window.confirm(`Delete book "${book?.name ?? 'Untitled'}"? This is irreversible.`);
-    if (!ok) return;
-
     const response = await FetchHelper.books.delete(id);
     console.log(response)
     if (!response.ok) return;
@@ -139,6 +133,8 @@ export default function MyBooks({
     if (openBook && openBook.id === id) {
       setOpenBook(null);
     }
+
+    setBookToDelete(null);
   };
   // --- end delete handler ---
 
@@ -164,6 +160,8 @@ export default function MyBooks({
           search={search}
           onDelete={handleDelete}
           setScreen={setScreen}
+          bookToDelete={bookToDelete}
+          setBookToDelete={setBookToDelete}
         />
       </main>
 

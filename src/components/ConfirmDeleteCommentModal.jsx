@@ -5,21 +5,21 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
-function ConfirmDeleteChapterModal({ chapterToDelete, setChapterToDelete, onDelete }) {
+function ConfirmDeleteCommentModal({ commentToDelete, setCommentToDelete, onDelete }) {
     const handleClose = () => {
-        setChapterToDelete(false);
+        setCommentToDelete(false);
     };
 
     return (
         <>
             <Dialog
-                open={chapterToDelete}
+                open={commentToDelete}
                 onClose={handleClose}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
                 <DialogTitle id="alert-dialog-title">
-                    {`Delete chapter "${chapterToDelete?.name}"?`}
+                    {"Delete comment?"}
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
@@ -37,4 +37,4 @@ function ConfirmDeleteChapterModal({ chapterToDelete, setChapterToDelete, onDele
     );
 }
 
-export default ConfirmDeleteChapterModal;
+export default ConfirmDeleteCommentModal;

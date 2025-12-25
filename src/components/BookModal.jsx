@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import "../styles/book-modal.css";
 import FetchHelper from "../fetchHelper";
+import ConfirmDeleteChapterModal from "./ConfirmDeleteChapterModal";
 
 export default function BookModal({
   open = false,
@@ -44,6 +45,7 @@ export default function BookModal({
   //  - для EDIT – по id
   const [viewExpandedId, setViewExpandedId] = useState(null);
   const [editExpandedId, setEditExpandedId] = useState(null);
+  const [chapterToDelete, setChapterToDelete] = useState(null);
 
   // loader
   const [isLoading, setIsLoading] = useState(true);
@@ -128,13 +130,8 @@ export default function BookModal({
     }
   };
 
-  const handleRemoveChapter = async (chapterId) => {
+  const handleDeleteChapter = async (chapterId) => {
     if (!draft) return;
-
-    const chapter = draft.chapters?.find(ch => ch.id === chapterId);
-
-    const ok = window.confirm(`Delete chapter "${chapter?.name || chapter?.title || 'Untitled'}" ? This is irreversible.`);
-    if (!ok) return;
 
     // Delete from backend
     try {
@@ -144,6 +141,7 @@ export default function BookModal({
         const updatedBook = await normalizeBook(book);
         setDraft(updatedBook);
         setEditExpandedId((prev) => (prev === chapterId ? null : prev));
+        setChapterToDelete(null);
       }
     } catch (error) {
       console.error("Error deleting chapter:", error);
@@ -477,7 +475,7 @@ export default function BookModal({
 
                     <button
                       className="bm-remove"
-                      onClick={() => handleRemoveChapter(ch.id)}
+                      onClick={() => setChapterToDelete(ch)}
                       type="button"
                     >
                       Delete
@@ -519,6 +517,12 @@ export default function BookModal({
           </button>
         </div>
       </div>
+
+      <ConfirmDeleteChapterModal
+        chapterToDelete={chapterToDelete}
+        setChapterToDelete={setChapterToDelete}
+        onDelete={() => handleDeleteChapter(chapterToDelete.id)}
+      />
     </div>
   );
 }
