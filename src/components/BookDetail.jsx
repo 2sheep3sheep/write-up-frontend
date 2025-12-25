@@ -5,7 +5,6 @@ import "../styles/book-detail.css";
 import ChapterEditorModal from "./ChapterEditorModal";
 import FetchHelper from "../fetchHelper";
 import BackArrow from "./generic/BackArrow";
-import Chapter from "./Chapter";
 
 // якщо у тебе вже є свій ChapterModal – можеш використати його
 function SimpleChapterModal({ chapter, onClose }) {
