@@ -178,7 +178,10 @@ export default function App() {
   }
 
   return (
-    <div style={{ position: "relative", width: "100%", height: "100%", overflowX: "hidden" }}>
+    <div style={{
+      position: "relative", width: "100%", height: "100%", overflowX: "hidden",
+      backgroundColor: "#0b3b5a"
+    }}>
 
       <AnimatePresence mode="wait">
         <Routes>
