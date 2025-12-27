@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import LogoCard from './LogoCard';
+import "../styles/auth.css";
 
 export default function WelcomeScreen({ onGetStarted = () => { }, onLogin = () => { }, navToInstantly }) {
 
@@ -7,11 +8,13 @@ export default function WelcomeScreen({ onGetStarted = () => { }, onLogin = () =
   const accessToken = localStorage.getItem("accessToken") ?? false;
 
   useEffect(
-    () => {if (accessToken) {
-      navToInstantly("/home")
-    }}, [ accessToken ]
+    () => {
+      if (accessToken) {
+        navToInstantly("/home")
+      }
+    }, [accessToken]
   )
-  
+
 
   return (
     <div className="auth-root">

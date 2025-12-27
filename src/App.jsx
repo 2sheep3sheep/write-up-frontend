@@ -179,8 +179,7 @@ export default function App() {
 
   return (
     <div style={{
-      position: "relative", width: "100%", height: "100%", overflowX: "hidden",
-      backgroundColor: "linear-gradient(rgb(11, 59, 90) 0%, rgb(11, 59, 90) 100%)"
+      position: "relative", width: "100%", maxHeight: "100%", overflowX: "hidden"
     }}>
 
       <AnimatePresence mode="wait">

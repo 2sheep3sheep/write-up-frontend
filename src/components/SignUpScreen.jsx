@@ -4,6 +4,7 @@ import { ClipLoader } from "react-spinners";
 import FetchHelper from '../fetchHelper';
 import Icon from '@mui/material/Icon';
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import "../styles/auth.css";
 
 export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = () => { }, loginLocal }) {
   const [isAuthor, setIsAuthor] = useState(false);
