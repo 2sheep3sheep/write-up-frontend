@@ -13,8 +13,8 @@ function Chapter({ setScreen }) {
     const [chapterData, setChapterData] = useState(null);
 
     const params = useParams();
-    const bookId = params.bookId;
-    const chapterId = params.chapterId;
+    const bookId = params.bookid;
+    const chapterId = params.chapterid;
 
     const isAuthor = localStorage.getItem("authorId") !== "null";
 

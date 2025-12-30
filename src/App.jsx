@@ -45,8 +45,8 @@ export default function App() {
   // GLOBAL BOOK STATE (синхронізація з localStorage)
   const [books, setBooks] = useState([])
 
-  const fetchBooks = async () => {
-    const fetchedBooks = await FetchHelper.books.list()
+  const fetchBooks = async (searchParams = undefined) => {
+    const fetchedBooks = await FetchHelper.books.list(searchParams)
     console.log(fetchedBooks.response)
     return Array.isArray(fetchedBooks.response) ? fetchedBooks.response : []
   }
@@ -178,9 +178,7 @@ export default function App() {
   }
 
   return (
-    <div style={{
-      position: "relative", width: "100%", height: "100%", overflowX: "hidden"
-    }}>
+    <div style={{ position: "relative", width: "100%", height: "100%", overflowX: "hidden" }}>
 
       <AnimatePresence mode="wait">
         <Routes>
@@ -235,6 +233,7 @@ export default function App() {
                   setScreen={navTo}
                   onCreateBook={handleCreateBook}
                   onViewMyBooks={() => navTo("mybooks", 1)}
+                  onViewChapter={(id) => navTo(`/chapter/${id}`, 1)}
                   books={books}
                   setBooks={setBooks}
                   fetchBooks={fetchBooks}
@@ -257,12 +256,13 @@ export default function App() {
                   setBooks={setBooks}
                   setScreen={navTo}
                   handleCreateBook={handleCreateBook}
+                  onViewChapter={(id) => navTo(`/chapter/${id}`, 1)}
                   fetchBooks={fetchBooks}
                   fetchClientBooks={fetchClientBooks} />
               </motion.div>
             } />
 
-          <Route path="/book/:bookId/chapter/:chapterId"
+          <Route path="/book/:bookid/chapter/:chapterid"
             element={
               <motion.div
                 animate={animationStateController()}
@@ -271,7 +271,7 @@ export default function App() {
                 style={{ width: '100%' }}
               >
 
-                <Chapter setScreen={navTo} />
+                <Chapter books={books} setScreen={navTo} fetchBooks={fetchBooks} />
               </motion.div>
             } />
 
@@ -308,4 +308,3 @@ export default function App() {
   );
 
 }
-

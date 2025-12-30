@@ -28,12 +28,14 @@ function SimpleChapterModal({ chapter, onClose }) {
 export default function BookDetail({
   books = [],
   setBooks = () => { },
-  setScreen = () => { },
+  setScreen,
   readOnly = false, // <<-- важливий прапорець
 }) {
+  const navigate = useNavigate();
+
+
   const [editorChapter, setEditorChapter] = useState(null);
   const [openedChapter, setOpenedChapter] = useState(null); // для перегляду тексту
-  const [detailCall, setDetailCall] = useState("inactive");
 
   const params = useParams();
   const bookId = params.id;
@@ -41,25 +43,17 @@ export default function BookDetail({
   const [canEdit, setCanEdit] = useState(false);
 
   const loadBook = async () => {
-    setDetailCall("pending");
+    const result = await FetchHelper.books.get(undefined, bookId);
 
-    try {
-      const result = await FetchHelper.books.get(undefined, bookId);
+    console.log("New book: ", result);
 
-      if (result.ok) {
-        setDetailCall("success");
-        setBook(result.response);
-        if (result.response.authorId === localStorage.getItem("authorId")) {
-          setCanEdit(true)
-        } else {
-          setCanEdit(false)
-        }
+    if (result.ok) {
+      setBook(result.response);
+      if (result.response.authorId === localStorage.getItem("authorId")) {
+        setCanEdit(true)
       } else {
-        setDetailCall("error");
+        setCanEdit(false)
       }
-    } catch (e) {
-      console.error(e);
-      setDetailCall("error");
     }
   }
 
@@ -154,6 +148,7 @@ export default function BookDetail({
   };
 
   const handleChapterClick = async (chapter) => {
+    /*
     const result = await FetchHelper.books.chapters.get(
       undefined,
       bookId,
@@ -161,23 +156,26 @@ export default function BookDetail({
     );
 
     if (result.ok) {
-      setScreen(`book/${bookId}/chapter/${chapter.id}`, 1)
-    }
+      setOpenedChapter(result.response);
+    }*/
+    setScreen(`book/${bookId}/chapter/${chapter.id}`,1)
   };
 
   return (
     <div>
-      {!book && detailCall !== "pending" ?
+      {!book ?
         <div style={{ padding: 20, color: "white" }}>
-          <BackArrow style={{ marginLeft: -30 }} onClick={() => setScreen("/home", -1)}>Back</BackArrow>
           <h1>Book not found</h1>
+          <BackArrow onClick={() => setScreen("/mybooks", -1)}>Back</BackArrow>
           <PageNavbar />
         </div>
         :
         <div className="book-detail-root">
-          <BackArrow style={{ marginLeft: -20, marginBottom: 20, width: 80 }} onClick={() => setScreen("/home", -1)}>Back</BackArrow>
-          <h1 className="book-title">{book?.name}</h1>
-          <p className="book-desc">{book?.description}</p>
+
+          <BackArrow style={{left:"0px", marginBottom:"24px"}} onClick={ () => {canEdit ? setScreen("/mybooks", -1) : setScreen("/home", -1) } }>Back</BackArrow>
+
+          <h1 className="book-title">{book.name}</h1>
+          <p className="book-desc">{book.description}</p>
 
           <div className="chapter-header">
             <h2>Chapters</h2>
@@ -194,7 +192,7 @@ export default function BookDetail({
           </div>
 
           <div className="chapter-list">
-            {book?.chapters?.length ? (
+            {book.chapters?.length ? (
               book.chapters.map((c) => (
                 <div
                   key={c.id}
@@ -216,8 +214,14 @@ export default function BookDetail({
                     <div className="chapter-buttons">
                       <button
                         className="ds-btn ds-btn-primary"
+                        onClick={
+                          (e) => {
+                            e.stopPropagation();
+                            handleChapterClick(c);
+                          }
+                        }
                       >
-                        View
+                        Read
                       </button>
                       {!canEdit ? <></> :
                         <button
