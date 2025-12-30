@@ -30,7 +30,7 @@ export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = 
     // temporary: simulate loading and success
     var isValid = true
     var newValidationState = {
-      username: "valid",
+      username: [],
       email: "valid",
       password: [],
       overall: "valid"
@@ -38,17 +38,19 @@ export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = 
 
     if (!username) { isValid = false; newValidationState.username = "A username is required"; }
     if (!email) { isValid = false; newValidationState.email = "An email is required"; }
+    if (!password) { isValid = false; newValidationState.password.push("A password is required") }
 
     if (password && password.length < 10) { isValid = false; newValidationState.password.push("• Password must be at least 10 characters long") }
     if (password && password.toUpperCase() == password) { isValid = false; newValidationState.password.push("• Password must include lowercase characters") }
     if (password && password.toLowerCase() == password) { isValid = false; newValidationState.password.push("• Password must include uppercase characters") }
 
-    var format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
+    var passwordRegEx = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
+    var spaceRegEx = /[\s]/;
+    var punctRegEx = /[\.,;:?!'"]/;
 
-    if (password && !format.test(password)) { isValid = false; newValidationState.password.push("• Password must include a special character") }
-
-
-    if (!password) { isValid = false; newValidationState.password.push("A password is required") }
+    if (password && !passwordRegEx.test(password)) { isValid = false; newValidationState.password.push("• Password must include a special character") }
+    if (username && spaceRegEx.test(username)) { isValid = false; newValidationState.username.push("• Spaces are not allowed") }
+    if (username && punctRegEx.test(username)) { isValid = false; newValidationState.username.push("• Punctuation (.,;:?!'\") is not allowed") }
 
     if (isValid) {
       // Call backend to register user
@@ -60,11 +62,9 @@ export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = 
         }
       )
 
-      const response = result.response;
-
       // If request is succesful
       if (!result.ok) {
-        newValidationState.overall = response.message;
+        newValidationState.overall = "Something went wrong...";
       } else {
         // Response is succesful, handle response data
         if (!isAuthor) {
@@ -77,7 +77,7 @@ export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = 
           console.log("Result")
           console.log(loginResult)
           if (loginResult.response.status === "error") {
-            newValidationState.overall = response.message;
+            newValidationState.overall = "Something went wrong...";
           } else {
             await loginLocal(loginResult.response)
             onRegisterSuccess();
@@ -92,9 +92,7 @@ export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = 
           const loginResponse = loginResult.response;
           // Logged user in, try creating profile
           if (!loginResult.ok) {
-
-            newValidationState.overall = loginResponse.message;
-
+            newValidationState.overall = "Something went wrong...";
           } else {
             await loginLocal(loginResponse)
             // Create profile with logged in information, token must be passed in directly, instead of fetching localStorage, due to a delay
@@ -145,7 +143,7 @@ export default function SignUpScreen({ onLogin = () => { }, onRegisterSuccess = 
         <p className="subtitle">Sign up to get started</p>
 
         <input className="input" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
-        <div className="error-message">{validationState.username != "valid" ? validationState.username : ""}</div>
+        <div className="error-message">{validationState.username != "valid" ? validationState.username.map((e) => <div>{e}</div>) : ""}</div>
 
         <input className="input" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
         <div className="error-message">{validationState.email != "valid" ? validationState.email : ""}</div>
