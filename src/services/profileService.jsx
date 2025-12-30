@@ -1,5 +1,7 @@
 // src/services/profileService.jsx
 
+import FetchHelper from "../fetchHelper";
+
 const STORAGE_KEY = "writeup.profile";
 
 const DEFAULT_PROFILE = {
@@ -15,6 +17,14 @@ function sleep(ms) {
 }
 
 export async function getProfile() {
+  const result = await FetchHelper.profile.get({id: localStorage.getItem("authorId") })
+  
+  console.log(result)
+  if (result && result.ok) {
+    return result.response;
+  }
+
+  /*
   await sleep(100);
   const raw = localStorage.getItem(STORAGE_KEY);
 
@@ -29,12 +39,41 @@ export async function getProfile() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_PROFILE));
     return DEFAULT_PROFILE;
   }
+  */
 }
 
 export async function updateProfile(patch) {
+  console.log(patch)
+
+  if (patch.imgUrl) {
+      
+    const resultImg = await FetchHelper.profile.uploadImg(
+      { 
+        userId: localStorage.getItem("userId"),
+        file: patch.imgUrl  
+      }
+    )
+
+    console.log("IMG RESP")
+    console.log(resultImg)
+  }
+
+  return patch
+
+  const result = await FetchHelper.profile.edit(
+    {
+        id: localStorage.getItem("authorId"),
+        bio: patch.bio
+    }
+  )
+  if (result && result.ok) {
+    return patch
+  }
+  /*
   await sleep(150);
   const current = await getProfile();
   const updated = { ...current, ...patch };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
   return updated;
+  */
 }
