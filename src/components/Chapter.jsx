@@ -249,12 +249,12 @@ function Chapter({ setScreen }) {
                                 <div className="comment" key={comment.id}>
                                     <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
                                         <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 10 }}>
-                                            <Avatar sx={{ bgcolor: "white", color: "black" }}>{comment.userId?.slice(0, 1)}</Avatar>
+                                            <Avatar sx={{ bgcolor: "white", color: "black" }}>{comment.username?.slice(0, 1)}</Avatar>
                                             <div>
-                                                <b>{comment.userId}</b>
+                                                <b>{comment.username}</b>
                                             </div>
                                         </div>
-                                        {comment.userId === localStorage.getItem("userId") &&
+                                        {comment.username === localStorage.getItem("username") &&
                                             <div style={{ margin: 10 }}>
                                                 <button className="ds-btn ds-btn-danger" onClick={() => setCommentToDelete(comment)}>Delete</button>
                                             </div>
