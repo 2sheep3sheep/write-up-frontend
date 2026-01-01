@@ -9,7 +9,7 @@ import "../styles/profile.css";
 function validate(form) {
   const errors = {};
 
-  if (!form.name?.trim()) errors.name = "Name is required.";
+  if (!form.username?.trim()) errors.username = "Username is required.";
   if (!form.email?.trim()) errors.email = "Email is required.";
   else if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) errors.email = "Email is not valid.";
 
@@ -36,10 +36,10 @@ export default function ProfileScreen() {
 
   const [profile, setProfile] = useState(null);
   const [form, setForm] = useState({
-    name: "",
+    username: "",
     email: "",
     bio: "",
-    avatarDataUrl: ""
+    imgUrl: ""
   });
 
   const [touched, setTouched] = useState({});
@@ -56,10 +56,10 @@ export default function ProfileScreen() {
 
         setProfile(p);
         setForm({
-          name: p.name ?? "",
+          username: p.username ?? "",
           email: p.email ?? "",
           bio: p.bio ?? "",
-          avatarDataUrl: p.avatarDataUrl ?? ""
+          imgUrl: p.imgUrl ?? ""
         });
       } finally {
         if (mounted) setLoading(false);
@@ -90,29 +90,32 @@ export default function ProfileScreen() {
     if (!profile) return;
     setTouched({});
     setForm({
-      name: profile.name ?? "",
+      username: profile.username ?? "",
       email: profile.email ?? "",
       bio: profile.bio ?? "",
-      avatarDataUrl: profile.avatarDataUrl ?? ""
+      imgUrl: profile.imgUrl ?? ""
     });
     setIsEditing(false);
   }
 
   async function confirmEdit() {
-    setTouched({ name: true, email: true, bio: true });
+    setTouched({ username: true, email: true, bio: true });
     const currentErrors = validate(form);
     if (Object.keys(currentErrors).length > 0) return;
 
     setSaving(true);
+
     try {
       const updated = await updateProfile({
-        name: form.name.trim(),
+        username: form.username.trim(),
         email: form.email.trim(),
         bio: form.bio,
-        avatarDataUrl: form.avatarDataUrl
+        imgUrl: form.imgUrl
       });
-      setProfile(updated);
+
+      setProfile( { ...profile, ...updated });
       setIsEditing(false);
+
     } finally {
       setSaving(false);
     }
@@ -122,7 +125,7 @@ export default function ProfileScreen() {
     const file = e.target.files?.[0];
     if (!file) return;
     const dataUrl = await fileToDataUrl(file);
-    setForm((prev) => ({ ...prev, avatarDataUrl: dataUrl }));
+    setForm((prev) => ({ ...prev, imgUrl: dataUrl }));
   }
 
   if (loading) {
@@ -157,9 +160,9 @@ export default function ProfileScreen() {
         <div className="section-title">Personal information</div>
         <div className="panel" style={{ display: "flex", gap: 14, alignItems: "center" }}>
           <div className="avatar-wrap">
-            {profile?.avatarDataUrl ? (
+            {profile?.imgUrl ? (
               <img
-                src={profile.avatarDataUrl}
+                src={profile.imgUrl}
                 alt="avatar"
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
@@ -170,7 +173,7 @@ export default function ProfileScreen() {
 
           <div style={{ lineHeight: 1.45 }}>
             <div style={{ fontSize: 16, opacity: 0.65 }}>Name</div>
-            <div style={{ fontSize: 20, fontWeight: 900 }}>{profile?.name}</div>
+            <div style={{ fontSize: 20, fontWeight: 900 }}>{profile?.username}</div>
           </div>
         </div>
 
@@ -210,17 +213,18 @@ export default function ProfileScreen() {
 
       <div className="title">Edit author's profile</div>
 
-      <div className="label">Name</div>
+      <div className="label">Username</div>
       <input
-        name="name"
-        value={form.name}
+        name="username"
+        value={form.username}
         onChange={onChange}
         onBlur={onBlur}
         className="input-like"
         placeholder="Name"
       />
-      {touched.name && errors.name ? <div className="error">{errors.name}</div> : null}
+      {touched.username && errors.username ? <div className="error">{errors.username}</div> : null}
 
+      {/*
       <div className="label">Email</div>
       <input
         name="email"
@@ -231,6 +235,8 @@ export default function ProfileScreen() {
         placeholder="Email"
       />
       {touched.email && errors.email ? <div className="error">{errors.email}</div> : null}
+
+      */}
 
       <div style={{ marginTop: 18 }}>
         <input
@@ -252,11 +258,11 @@ export default function ProfileScreen() {
           Upload image
         </button>
 
-        {form.avatarDataUrl ? (
+        {form.imgUrl ? (
           <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
             <div className="avatar-wrap">
               <img
-                src={form.avatarDataUrl}
+                src={form.imgUrl}
                 alt="preview"
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
@@ -264,7 +270,7 @@ export default function ProfileScreen() {
 
             <button
               type="button"
-              onClick={() => setForm((p) => ({ ...p, avatarDataUrl: "" }))}
+              onClick={() => setForm((p) => ({ ...p, imgUrl: "" }))}
               style={{
                 padding: "12px 14px",
                 borderRadius: 14,

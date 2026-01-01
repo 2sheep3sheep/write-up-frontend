@@ -1,4 +1,53 @@
+function dataURLToBlob(dataUrl) {
+  const [header, base64] = dataUrl.split(",");
+  const mimeMatch = header.match(/:(.*?);/);
+  const mime = mimeMatch ? mimeMatch[1] : "application/octet-stream";
 
+  const binary = atob(base64);
+  const array = new Uint8Array(binary.length);
+
+  for (let i = 0; i < binary.length; i++) {
+    array[i] = binary.charCodeAt(i);
+  }
+
+  return new Blob([array], { type: mime });
+}
+
+async function Upload(baseUri, dtoIn) {
+    
+    try {
+        let response;
+
+        const formData = new FormData();
+
+        const imageBlob = dataURLToBlob(dtoIn.file)
+
+        formData.append("avatar", imageBlob, "image.png")
+
+        response = await fetch(`${baseUri}/profile/upload`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
+                    },
+                    body: formData
+                }
+            ); 
+        
+        let data = {}
+
+        if (response) {
+            try {
+                data = await response.json();
+            } catch (e) { }
+        }
+
+        return { ok: response.ok, status: response.status, response: data };
+    } catch (e) {
+        console.log(e)
+        return { ok: false, status: "error" }
+    }
+}
 
 async function Call(baseUri, useCase, dtoIn, method, token = undefined) {
 
@@ -85,6 +134,9 @@ const FetchHelper = {
     },
     profile: {
         create: async (dtoIn, token) => Call(baseUri, `profile`, dtoIn, "post", token),
+        get: async (dtoIn) => Call(baseUri, `profile`, dtoIn, "get"),
+        edit: async (dtoIn) => Call(baseUri, `profile`, dtoIn, "patch"),
+        uploadImg: async (dtoIn) => Upload(baseUri, dtoIn),
     }
 }
 
