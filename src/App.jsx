@@ -1,4 +1,3 @@
-// src/App.jsx
 import React, { useState, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 
@@ -15,7 +14,7 @@ import "./styles/design-system.css";
 export default function App() {
   const navigate = useNavigate();
 
-  // GLOBAL BOOK STATE (синхронізація з localStorage)
+  // GLOBAL BOOK STATE
   const [books, setBooks] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem("mybooks") || "[]");
@@ -28,7 +27,6 @@ export default function App() {
     try { localStorage.setItem("mybooks", JSON.stringify(books)); } catch (e) { console.warn(e); }
   }, [books]);
 
-  // CREATE BOOK helper (отримує newBook від CreateBookModal)
   const handleCreateBook = (newBook) => {
     const book = {
       id: newBook.id ?? Date.now().toString(),
@@ -50,9 +48,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<WelcomeScreen onGetStarted={() => navigate("/signup")} onLogin={() => navigate("/login")} />} />
-
       <Route path="/signup" element={<SignUpScreen onLogin={() => navigate("/login")} onRegisterSuccess={() => navigate("/home")} />} />
-
       <Route path="/login" element={<LoginScreen onSignUp={() => navigate("/signup")} onLoginSuccess={() => navigate("/home")} />} />
 
       <Route path="/home" element={
@@ -68,22 +64,26 @@ export default function App() {
       <Route
         path="/mybooks"
         element={
-      <MyBooks
-        books={books}
-        setBooks={setBooks}
-        onViewBook={(id) => navigate(`/book/${id}`)}
+          <MyBooks
+            books={books}
+            setBooks={setBooks}
+            onViewBook={(id) => navigate(`/book/${id}`)}
+          />
+        }
       />
-    }
-  />
 
-<Route path="/book" element={<BookLayout />}>
-  <Route
-    path=":id"
-    element={<BookDetail books={books} setBooks={setBooks} />}
-  />
-</Route>
+      <Route path="/book" element={<BookLayout />}>
+        <Route
+          path=":id"
+          element={<BookDetail books={books} setBooks={setBooks} />}
+        />
+      </Route>
 
+      {/* МАРШРУТ ДЛЯ ТЕБЕ */}
       <Route path="/profile" element={<ProfileScreen setScreen={navigate} />} />
+      
+      <Route path="/author" element={<ProfileScreen setScreen={navigate} />} />
+      
     </Routes>
   );
 }
