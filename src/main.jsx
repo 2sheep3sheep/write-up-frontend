@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './styles/auth.css'; // глобальний стиль для auth екранів
 import './styles/post-auth.css'; // import styles for post-auth elements
+import FetchHelper from './fetchHelper';
 
 // -----------------------
 // Очистка localStorage при старті (контрольовано через .env)

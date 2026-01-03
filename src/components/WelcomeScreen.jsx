@@ -1,7 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import LogoCard from './LogoCard';
+import "../styles/auth.css";
 
-export default function WelcomeScreen({ onGetStarted = () => { }, onLogin = () => { } }) {
+export default function WelcomeScreen({ onGetStarted = () => { }, onLogin = () => { }, navToInstantly }) {
+
+
+  const accessToken = localStorage.getItem("accessToken") ?? false;
+
+  useEffect(
+    () => {
+      if (accessToken) {
+        navToInstantly("/home")
+      }
+    }, [accessToken]
+  )
+
+
   return (
     <div className="auth-root">
       <div className="auth-container">

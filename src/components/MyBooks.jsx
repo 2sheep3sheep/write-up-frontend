@@ -4,12 +4,17 @@ import PageNavbar from "./generic/PageNavbar";
 import CreateBookModal from "./CreateBookModal";
 import BookModal from "./BookModal";
 import "../styles/mybooks.css";
+import FetchHelper from "../fetchHelper";
 import SearchField from "./SearchField";
 import BookList from "./BookList";
 
-export default function MyBooks({ books = [], setBooks = () => {}, setScreen = () => {} }) {
-  const [search, setSearch] = useState("");
-
+export default function MyBooks({
+  setBooks = () => { },
+  setScreen = () => { },
+  onViewChapter,
+  handleCreateBook,
+  fetchBooks,
+  fetchClientBooks }) {
   const [list, setList] = useState(() => {
     try {
       const fromLocal = JSON.parse(localStorage.getItem("mybooks") || "[]");
@@ -19,13 +24,32 @@ export default function MyBooks({ books = [], setBooks = () => {}, setScreen = (
     }
   });
 
+  const [search, setSearch] = useState("");
+
+  /* 
   const filteredBooks = list.filter(b =>
     b.title.toLowerCase().includes(search.toLowerCase())
-  );
+  );*/
+
+  const books = []
+
+  const loadBooks = async () => {
+    const fetched = await fetchClientBooks();
+    const booksArray = Array.isArray(fetched) ? fetched : [];
+    setList(booksArray);
+  }
+
+  useEffect(() => {
+    loadBooks();
+  }, []);
+
 
   useEffect(() => {
     localStorage.setItem("mybooks", JSON.stringify(list));
-    if (typeof setBooks === "function") setBooks(list);
+    // Move setBooks to avoid setState during render
+    if (typeof setBooks === "function") {
+      setTimeout(() => setBooks(list), 0);
+    }
   }, [list]);
 
   useEffect(() => {
@@ -35,23 +59,33 @@ export default function MyBooks({ books = [], setBooks = () => {}, setScreen = (
   const [createOpen, setCreateOpen] = useState(false);
   const [openBook, setOpenBook] = useState(null);
   const [modalMode, setModalMode] = useState("view");
+  const [bookToDelete, setBookToDelete] = useState(null);
 
   const openView = (book) => {
+    /*
     setOpenBook(book);
     setModalMode("view");
+    */
+    setScreen(`book/${book.id}`, 1)
   };
+
   const openEdit = (book) => {
     setOpenBook(book);
     setModalMode("edit");
   };
 
-  const handleCreate = (newBook) => {
+  const handleCreate = async (newBook) => {
     const normalized = {
       ...newBook,
+      name: newBook.name,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       chapters: Array.isArray(newBook.chapters)
-        ? newBook.chapters.map(t => (typeof t === 'string' ? { title: t, content: "" } : t))
+        ? newBook.chapters.map(n => (typeof n === 'string' ? {
+          id: Date.now().toString(), index: newBook.chapters.length, book_id: newBook.id, name: n, content: "",
+          createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+        } : n))
         : [],
-      lastEdited: newBook.lastEdited ?? new Date().toISOString(),
       id: newBook.id ?? Date.now().toString(),
     };
 
@@ -62,12 +96,18 @@ export default function MyBooks({ books = [], setBooks = () => {}, setScreen = (
       return next;
     });
 
+    await handleCreateBook(normalized);
+
+    loadBooks();
+
     setCreateOpen(false);
+
+    console.log(books)
   };
 
   const handleSave = (updated) => {
     setList(prev => {
-      const next = prev.map(b => (b.id === updated.id ? { ...updated, lastEdited: new Date().toISOString() } : b));
+      const next = prev.map(b => (b.id === updated.id ? { ...updated, updatedAt: new Date().toISOString() } : b));
       try { localStorage.setItem("mybooks", JSON.stringify(next)); } catch (e) { console.warn(e); }
       if (typeof setBooks === "function") setBooks(next);
       return next;
@@ -76,10 +116,11 @@ export default function MyBooks({ books = [], setBooks = () => {}, setScreen = (
   };
 
   // --- NEW: delete handler ---
-  const handleDelete = (id) => {
-    const book = list.find(b => b.id === id);
-    const ok = window.confirm(`Видалити книгу "${book?.title ?? 'Без назви'}"? Це незворотно.`);
-    if (!ok) return;
+  const handleDelete = async (id) => {
+    const response = await FetchHelper.books.delete(id);
+    console.log(response)
+    if (!response.ok) return;
+    if (response.ok) loadBooks();
 
     setList(prev => {
       const next = prev.filter(b => b.id !== id);
@@ -92,6 +133,8 @@ export default function MyBooks({ books = [], setBooks = () => {}, setScreen = (
     if (openBook && openBook.id === id) {
       setOpenBook(null);
     }
+
+    setBookToDelete(null);
   };
   // --- end delete handler ---
 
@@ -111,10 +154,14 @@ export default function MyBooks({ books = [], setBooks = () => {}, setScreen = (
         <SearchField value={search} onChange={setSearch} />
 
         <BookList
-          books={filteredBooks}
+          books={list}
           onView={openView}
           onEdit={openEdit}
+          search={search}
           onDelete={handleDelete}
+          setScreen={setScreen}
+          bookToDelete={bookToDelete}
+          setBookToDelete={setBookToDelete}
         />
       </main>
 
@@ -134,6 +181,7 @@ export default function MyBooks({ books = [], setBooks = () => {}, setScreen = (
         mode={modalMode}
         onClose={() => setOpenBook(null)}
         onSave={handleSave}
+        onViewChapter={onViewChapter}
       />
     </div>
   );

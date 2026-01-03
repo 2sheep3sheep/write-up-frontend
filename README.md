@@ -29,4 +29,4 @@ Pokud je spuštění úspěšné, aplikace poběží na adrese http://localhost:
   ➜  press h + enter to show help
 ```
 
-Deploy frontendu aplikace naleznete na adrese https://write-up-deploy.vercel.app/
+Frontend je nasazen na adrese https://write-up.eu/

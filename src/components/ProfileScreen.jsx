@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PageNavbar from "./generic/PageNavbar.jsx";
 import { getProfile, updateProfile } from "../services/profileService.jsx";
+import "../styles/profile.css";
 
 // Валідація форми
 function validate(form) {
@@ -106,6 +107,7 @@ export default function ProfileScreen() {
     if (Object.keys(validate(form)).length > 0) return;
 
     setSaving(true);
+
     try {
       const updated = await updateProfile({
         name: form.name.trim(),
@@ -113,8 +115,10 @@ export default function ProfileScreen() {
         bio: form.bio,
         avatarDataUrl: form.avatarDataUrl
       });
-      setProfile(updated);
+
+      setProfile({ ...profile, ...updated });
       setIsEditing(false);
+
     } finally {
       setSaving(false);
     }

@@ -40,4 +40,5 @@ export async function updateProfile(patch) {
   const updated = { ...current, ...patch };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
   return updated;
+  */
 }
