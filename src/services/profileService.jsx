@@ -24,7 +24,7 @@ export async function getProfile() {
   const isAuthorPage = window.location.pathname.includes("author");
 
   if (isAuthorPage) {
-    return AUTHOR_DATA; 
+    return AUTHOR_DATA;
   }
 
   const raw = localStorage.getItem(STORAGE_KEY);
@@ -40,5 +40,4 @@ export async function updateProfile(patch) {
   const updated = { ...current, ...patch };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
   return updated;
-  */
 }
