@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import PageNavbar from "./generic/PageNavbar";
 import "../styles/book-detail.css";
 import ChapterEditorModal from "./ChapterEditorModal";
 import FetchHelper from "../fetchHelper";
 import BackArrow from "./generic/BackArrow";
+import { useBookContext } from "../context/BookContext.jsx";
 
 // якщо у тебе вже є свій ChapterModal – можеш використати його
 function SimpleChapterModal({ chapter, onClose }) {
@@ -31,25 +32,25 @@ export default function BookDetail({
   setScreen,
   readOnly = false, // <<-- важливий прапорець
 }) {
-  const navigate = useNavigate();
-
-
   const [editorChapter, setEditorChapter] = useState(null);
   const [openedChapter, setOpenedChapter] = useState(null); // для перегляду тексту
 
   const params = useParams();
   const bookId = params.id;
 
+  const { setCurrentBook } = useBookContext();
+
   const [canEdit, setCanEdit] = useState(false);
 
   const loadBook = async () => {
     const result = await FetchHelper.books.get(undefined, bookId);
-
-    console.log("New book: ", result);
+    const response = result.response;
 
     if (result.ok) {
-      setBook(result.response);
-      if (result.response.authorId === localStorage.getItem("authorId")) {
+      setBook(response);
+      setCurrentBook(response);
+
+      if (response.authorId === localStorage.getItem("authorId")) {
         setCanEdit(true)
       } else {
         setCanEdit(false)
@@ -57,7 +58,8 @@ export default function BookDetail({
     }
   }
 
-  const [book, setBook] = useState()
+  const [book, setBook] = useState();
+  const authorId = book?.authorId;
 
   useEffect(() => {
     loadBook();
@@ -173,9 +175,15 @@ export default function BookDetail({
         <div className="book-detail-root">
 
           <BackArrow style={{ left: "0px", marginBottom: "24px", width: 80 }} onClick={() => { canEdit ? setScreen("/mybooks", -1) : setScreen("/home", -1) }}>Back</BackArrow>
-
           <h1 className="book-title">{book.name}</h1>
           <p className="book-desc">{book.description}</p>
+          {authorId !== localStorage.getItem("authorId") &&
+            <button
+              className="add-btn"
+              onClick={() => setScreen(`/author/${authorId}`, 1)}>
+              Author's Profile
+            </button>
+          }
 
           <div className="chapter-header">
             <h2>Chapters</h2>

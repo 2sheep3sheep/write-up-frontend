@@ -16,8 +16,14 @@ function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-export async function getProfile() {
-  const result = await FetchHelper.profile.get({ id: localStorage.getItem("authorId") })
+export async function getProfile(authorId) {
+  let result = "";
+
+  if (localStorage.getItem("authorId") === "null") {
+    result = await FetchHelper.profile.get({ id: authorId })
+  } else {
+    result = await FetchHelper.profile.get({ id: localStorage.getItem("authorId") })
+  }
 
   console.log(result)
   if (result && result.ok) {

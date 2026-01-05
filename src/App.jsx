@@ -302,6 +302,19 @@ export default function App() {
               </motion.div>
             } />
 
+          <Route path="/author/:authorId"
+            element={
+              <motion.div
+                animate={animationStateController()}
+                onAnimationComplete={() => handleAnimationFinish()}
+
+                style={{ width: '100%' }}
+              >
+
+                <ProfileScreen pathname={pathname} setScreen={navTo} />
+              </motion.div>
+            } />
+
         </Routes>
       </AnimatePresence>
     </div>

@@ -1,8 +1,9 @@
 // src/components/ProfileScreen.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import PageNavbar from "./generic/PageNavbar.jsx";
 import { getProfile, updateProfile } from "../services/profileService.jsx";
+import BackArrow from "./generic/BackArrow.jsx";
+import { useBookContext } from "../context/BookContext.jsx";
 import "../styles/profile.css";
 
 function validate(form) {
@@ -26,9 +27,7 @@ function fileToDataUrl(file) {
   });
 }
 
-export default function ProfileScreen() {
-  const navigate = useNavigate();
-
+export default function ProfileScreen({ setScreen }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -45,13 +44,21 @@ export default function ProfileScreen() {
   const errors = useMemo(() => validate(form), [form]);
   const fileInputRef = useRef(null);
 
+  const isAuthor = window.location.pathname === "/profile";
+
+  const { currentBook } = useBookContext();
+  const bookId = currentBook?.id;
+  const authorId = currentBook?.authorId;
+
   useEffect(() => {
     let mounted = true;
     (async () => {
       setLoading(true);
       try {
-        const p = await getProfile();
+        const p = await getProfile(authorId);
         if (!mounted) return;
+
+        console.log(profile);
 
         setProfile(p);
         setForm({
@@ -130,7 +137,7 @@ export default function ProfileScreen() {
   if (loading) {
     return (
       <div className="page">
-        <div className="title">Author's profile</div>
+        <div className="title">{isAuthor ? "My Profile" : "Author's Profile"}</div>
         <div className="panel">Loading...</div>
         <PageNavbar />
       </div>
@@ -140,47 +147,87 @@ export default function ProfileScreen() {
   // ===== VIEW MODE =====
   if (!isEditing) {
     return (
-      <div className="page">
-        <div className="title">Author's profile</div>
+      isAuthor ?
+        <div className="page">
+          <div className="title">My Profile</div>
 
-        <div className="section-title">Personal information</div>
-        <div className="panel" style={{ display: "flex", gap: 14, alignItems: "center" }}>
-          <div className="avatar-wrap">
-            {profile?.imgUrl ? (
-              <img
-                src={profile.imgUrl}
-                alt="avatar"
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
-            ) : (
-              <div style={{ fontSize: 30, opacity: 0.65 }}>👤</div>
-            )}
+          <div className="section-title">Personal information</div>
+          <div className="panel" style={{ display: "flex", gap: 14, alignItems: "center" }}>
+            <div className="avatar-wrap">
+              {profile?.imgUrl ? (
+                <img
+                  src={profile.imgUrl}
+                  alt="avatar"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              ) : (
+                <div style={{ fontSize: 30, opacity: 0.65 }}>👤</div>
+              )}
+            </div>
+
+            <div style={{ lineHeight: 1.45 }}>
+              <div style={{ fontSize: 16, opacity: 0.65 }}>Name</div>
+              <div style={{ fontSize: 20, fontWeight: 900 }}>{profile?.username}</div>
+            </div>
           </div>
 
-          <div style={{ lineHeight: 1.45 }}>
-            <div style={{ fontSize: 16, opacity: 0.65 }}>Name</div>
-            <div style={{ fontSize: 20, fontWeight: 900 }}>{profile?.username}</div>
+          <div className="section-title">Contact</div>
+          <div className="panel">
+            <div className="input-like">{profile?.email}</div>
+          </div>
+
+          <div className="section-title">Bio</div>
+          <div className="panel">
+            <div className="input-like" style={{ minHeight: 130, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>
+              {profile?.bio}
+            </div>
+          </div>
+
+          <button className="primary-big" onClick={startEdit}>
+            Edit Profile
+          </button>
+
+          <PageNavbar />
+        </div> :
+        <div className="page">
+          <div className="back-btn" style={{ marginBottom: 30 }}>
+            <BackArrow onClick={() => setScreen(`/book/${bookId}`, -1)}>Back</BackArrow>
+          </div>
+
+          <div className="title">Author's Profile</div>
+
+          <div className="section-title">Personal information</div>
+          <div className="panel" style={{ display: "flex", gap: 14, alignItems: "center" }}>
+            <div className="avatar-wrap">
+              {profile?.imgUrl ? (
+                <img
+                  src={profile.imgUrl}
+                  alt="avatar"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              ) : (
+                <div style={{ fontSize: 30, opacity: 0.65 }}>👤</div>
+              )}
+            </div>
+
+            <div style={{ lineHeight: 1.45 }}>
+              <div style={{ fontSize: 16, opacity: 0.65 }}>Name</div>
+              <div style={{ fontSize: 20, fontWeight: 900 }}>{profile?.username}</div>
+            </div>
+          </div>
+
+          <div className="section-title">Contact</div>
+          <div className="panel">
+            <div className="input-like">{profile?.email}</div>
+          </div>
+
+          <div className="section-title">Bio</div>
+          <div className="panel">
+            <div className="input-like" style={{ minHeight: 130, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>
+              {profile?.bio}
+            </div>
           </div>
         </div>
-
-        <div className="section-title">Contact</div>
-        <div className="panel">
-          <div className="input-like">{profile?.email}</div>
-        </div>
-
-        <div className="section-title">Bio</div>
-        <div className="panel">
-          <div className="input-like" style={{ minHeight: 130, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>
-            {profile?.bio}
-          </div>
-        </div>
-
-        <button className="primary-big" onClick={startEdit}>
-          Edit Profile
-        </button>
-
-        <PageNavbar />
-      </div>
     );
   }
 
@@ -188,7 +235,7 @@ export default function ProfileScreen() {
   return (
     <div className="page">
 
-      <div className="title">Edit author's profile</div>
+      <div className="title">Edit profile</div>
 
       <div className="label">Username</div>
       <input
