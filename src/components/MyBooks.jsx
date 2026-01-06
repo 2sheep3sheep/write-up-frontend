@@ -7,13 +7,13 @@ import "../styles/mybooks.css";
 import FetchHelper from "../fetchHelper";
 import SearchField from "./SearchField";
 import BookList from "./BookList";
+import { useRouteContext } from "../context/RouteContext";
 
 export default function MyBooks({
   setBooks = () => { },
   setScreen = () => { },
   onViewChapter,
   handleCreateBook,
-  fetchBooks,
   fetchClientBooks }) {
   const [list, setList] = useState(() => {
     try {
@@ -33,10 +33,13 @@ export default function MyBooks({
 
   const books = []
 
+  const { setCurrentRoute } = useRouteContext();
+
   const loadBooks = async () => {
     const fetched = await fetchClientBooks();
     const booksArray = Array.isArray(fetched) ? fetched : [];
     setList(booksArray);
+    setCurrentRoute("/mybooks");
   }
 
   useEffect(() => {

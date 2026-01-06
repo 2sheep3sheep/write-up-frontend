@@ -187,6 +187,18 @@
     box-shadow: 0 14px 24px rgba(0, 0, 0, 0.28);
 }
 
+.profile-footer {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(3, 12, 22, 0.4);
+    padding: 8px 12px;
+    display: flex;
+    justify-content: center;
+    box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.35);
+}
+
 @media (max-width: 768px) {
     .profile-title {
         font-size: 28px;

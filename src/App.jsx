@@ -9,8 +9,8 @@ import ProfileScreen from './components/ProfileScreen';
 import Chapter from "./components/Chapter";
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import FetchHelper from "./fetchHelper";
-import { path } from "framer-motion/client";
 import BookDetail from "./components/BookDetail";
+import DiscoverScreen from "./components/DiscoverScreen";
 
 import "./styles/design-system.css";
 
@@ -243,6 +243,27 @@ export default function App() {
               </motion.div>
             } />
 
+          <Route path="/discover"
+            element={
+              <motion.div
+                animate={animationStateController()}
+                onAnimationComplete={() => handleAnimationFinish()}
+
+                style={{ width: '100%' }}
+              >
+
+                <DiscoverScreen pathname={pathname}
+                  setScreen={navTo}
+                  onViewChapter={(id) => navTo(`/chapter/${id}`, 1)}
+                  books={books}
+                  setBooks={setBooks}
+                  fetchBooks={fetchBooks}
+                  fetchClientBooks={fetchClientBooks}
+                  removeLocalSessionData={removeLocalSessionData}
+                />
+              </motion.div>
+            } />
+
           <Route path="/mybooks"
             element={
               <motion.div
@@ -257,7 +278,6 @@ export default function App() {
                   setScreen={navTo}
                   handleCreateBook={handleCreateBook}
                   onViewChapter={(id) => navTo(`/chapter/${id}`, 1)}
-                  fetchBooks={fetchBooks}
                   fetchClientBooks={fetchClientBooks} />
               </motion.div>
             } />

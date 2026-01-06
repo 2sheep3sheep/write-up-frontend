@@ -120,11 +120,12 @@
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 12px;
+  bottom: 0;
+  background: rgba(3, 12, 22, 0.4);
+  padding: 8px 12px;
   display: flex;
   justify-content: center;
-  pointer-events: none;
-  /* inner navbar will accept clicks */
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.35);
 }
 
 /* ensure navbar inside footer has pointer events */

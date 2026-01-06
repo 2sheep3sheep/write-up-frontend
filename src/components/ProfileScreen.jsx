@@ -4,14 +4,12 @@ import PageNavbar from "./generic/PageNavbar.jsx";
 import { getProfile, updateProfile } from "../services/profileService.jsx";
 import BackArrow from "./generic/BackArrow.jsx";
 import { useBookContext } from "../context/BookContext.jsx";
+import FetchHelper from "../fetchHelper.js";
 import "../styles/profile.css";
+import "../styles/home.css";
 
 function validate(form) {
   const errors = {};
-
-  if (!form.username?.trim()) errors.username = "Username is required.";
-  if (!form.email?.trim()) errors.email = "Email is required.";
-  else if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) errors.email = "Email is not valid.";
 
   if (form.bio && form.bio.length > 800) errors.bio = "Bio must be max 800 characters.";
 
@@ -34,8 +32,6 @@ export default function ProfileScreen({ setScreen }) {
 
   const [profile, setProfile] = useState(null);
   const [form, setForm] = useState({
-    username: "",
-    email: "",
     bio: "",
     imgUrl: ""
   });
@@ -50,6 +46,22 @@ export default function ProfileScreen({ setScreen }) {
   const bookId = currentBook?.id;
   const authorId = currentBook?.authorId;
 
+  const [authorBooks, setAuthorBooks] = useState([])
+
+  const fetchAuthorBooks = async () => {
+    if (authorId == "null" || !authorId) {
+      return [];
+    } else {
+      const fetchedBooks = await FetchHelper.books.list({ authorId })
+      console.log(fetchedBooks.response)
+      setAuthorBooks(fetchedBooks.response)
+    }
+  }
+
+  useEffect(() => {
+    fetchAuthorBooks();
+  }, []);
+
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -62,8 +74,6 @@ export default function ProfileScreen({ setScreen }) {
 
         setProfile(p);
         setForm({
-          username: p.username ?? "",
-          email: p.email ?? "",
           bio: p.bio ?? "",
           imgUrl: p.imgUrl ?? ""
         });
@@ -96,8 +106,6 @@ export default function ProfileScreen({ setScreen }) {
     if (!profile) return;
     setTouched({});
     setForm({
-      username: profile.username ?? "",
-      email: profile.email ?? "",
       bio: profile.bio ?? "",
       imgUrl: profile.imgUrl ?? ""
     });
@@ -105,7 +113,7 @@ export default function ProfileScreen({ setScreen }) {
   }
 
   async function confirmEdit() {
-    setTouched({ username: true, email: true, bio: true });
+    setTouched({ bio: true });
     const currentErrors = validate(form);
     if (Object.keys(currentErrors).length > 0) return;
 
@@ -113,8 +121,6 @@ export default function ProfileScreen({ setScreen }) {
 
     try {
       const updated = await updateProfile({
-        username: form.username.trim(),
-        email: form.email.trim(),
         bio: form.bio,
         imgUrl: form.imgUrl
       });
@@ -139,8 +145,10 @@ export default function ProfileScreen({ setScreen }) {
       <div className="page">
         <div className="title">{isAuthor ? "My Profile" : "Author's Profile"}</div>
         <div className="panel">Loading...</div>
-        <PageNavbar />
-      </div>
+        <footer className="profile-footer">
+          <PageNavbar setScreen={setScreen} />
+        </footer>
+      </div >
     );
   }
 
@@ -187,7 +195,9 @@ export default function ProfileScreen({ setScreen }) {
             Edit Profile
           </button>
 
-          <PageNavbar />
+          <footer className="profile-footer">
+            <PageNavbar setScreen={setScreen} />
+          </footer>
         </div> :
         <div className="page">
           <div className="back-btn" style={{ marginBottom: 30 }}>
@@ -227,6 +237,25 @@ export default function ProfileScreen({ setScreen }) {
               {profile?.bio}
             </div>
           </div>
+
+          <div className="section-title">Books</div>
+          <div className="recent-list" role="list">
+            {
+              authorBooks.map((b) => (
+                <div className="recent-item" key={b.id} role="listitem" onClick={() => setScreen(`book/${b.id}`, 1)}>
+                  <div className="recent-icon">📗</div>
+                  <div className="recent-body">
+                    <div className="recent-title">{b.name}</div>
+                    <div className="recent-meta">
+                      <span>{b.genre}</span>
+                      <span> • </span>
+                      <span>⏱ {b.updatedAt || "—"}</span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
         </div>
     );
   }
@@ -237,32 +266,8 @@ export default function ProfileScreen({ setScreen }) {
 
       <div className="title">Edit profile</div>
 
-      <div className="label">Username</div>
-      <input
-        name="username"
-        value={form.username}
-        onChange={onChange}
-        onBlur={onBlur}
-        className="input-like"
-        placeholder="Name"
-      />
-      {touched.username && errors.username ? <div className="error">{errors.username}</div> : null}
-
-      {/*
-      <div className="label">Email</div>
-      <input
-        name="email"
-        value={form.email}
-        onChange={onChange}
-        onBlur={onBlur}
-        className="input-like"
-        placeholder="Email"
-      />
-      {touched.email && errors.email ? <div className="error">{errors.email}</div> : null}
-
-      */}
-
       <div style={{ marginTop: 18 }}>
+        <div className="label">Profile image</div>
         <input
           ref={fileInputRef}
           type="file"

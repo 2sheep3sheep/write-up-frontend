@@ -6,6 +6,7 @@ import FetchHelper from "../fetchHelper";
 import Avatar from "@mui/material/Avatar";
 import TextField from "@mui/material/TextField";
 import ConfirmDeleteCommentModal from "./ConfirmDeleteCommentModal";
+import { useBookContext } from "../context/BookContext";
 import "../styles/chapter.css";
 
 function Chapter({ setScreen }) {
@@ -16,7 +17,7 @@ function Chapter({ setScreen }) {
     const bookId = params.bookid;
     const chapterId = params.chapterid;
 
-    const isAuthor = localStorage.getItem("authorId") !== "null";
+    const authorId = localStorage.getItem("authorId");
 
     const [commentCall, setCommentCall] = useState("inactive");
     const [comments, setComments] = useState([]);
@@ -24,6 +25,8 @@ function Chapter({ setScreen }) {
 
     const [newCommentText, setNewCommentText] = useState("");
     const [commentToDelete, setCommentToDelete] = useState(null);
+
+    const { currentBook } = useBookContext();
 
     const handleAddComment = async () => {
         const dtoIn = {
@@ -127,8 +130,8 @@ function Chapter({ setScreen }) {
             } else {
                 setCommentCall("error");
             }
-        } catch (err) {
-            console.error(err);
+        } catch (e) {
+            console.error(e);
             setCommentCall("error");
         }
     };
@@ -139,7 +142,6 @@ function Chapter({ setScreen }) {
         loadComments();
     }, []);
 
-    // Loading state
     if (chapterCall === "pending") {
         return (
             <div className="chapter-root">
@@ -168,8 +170,7 @@ function Chapter({ setScreen }) {
         );
     }
 
-    // Error
-    if (!chapterData) {
+    if (chapterCall === "error") {
         return (
             <div className="chapter-root">
                 <header className="chapter-header">
@@ -197,7 +198,6 @@ function Chapter({ setScreen }) {
         );
     }
 
-    // Success state
     return (
         <>
             <div className="chapter-root">
@@ -207,7 +207,7 @@ function Chapter({ setScreen }) {
                     </div>
                     <div className="header-center">
                         <h1 className="chapter-title">
-                            {chapterData.name}
+                            {chapterData?.name}
                         </h1>
                     </div>
                     <div className="header-right" />
@@ -222,12 +222,12 @@ function Chapter({ setScreen }) {
                             }}
                             className="chapter-content"
                         >
-                            {chapterData.content}
+                            {chapterData?.content}
                         </div>
                         <div className="comment-header">
                             <h2>Comments</h2>
 
-                            {!isAuthor && (
+                            {authorId !== currentBook.authorId && (
                                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                                     {commentValid ?
                                         <TextField

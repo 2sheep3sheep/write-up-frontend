@@ -6,6 +6,7 @@ import App from './App';
 import './styles/auth.css'; // глобальний стиль для auth екранів
 import './styles/post-auth.css'; // import styles for post-auth elements
 import { BookProvider } from './context/BookContext.jsx';
+import { RouteProvider } from './context/RouteContext.jsx';
 
 // -----------------------
 // Очистка localStorage при старті (контрольовано через .env)
@@ -24,9 +25,11 @@ if (import.meta.env.VITE_CLEAR_MYBOOKS === "1") {
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BookProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <RouteProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </RouteProvider>
     </BookProvider>
   </React.StrictMode>
 );

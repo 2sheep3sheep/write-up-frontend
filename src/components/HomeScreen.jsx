@@ -8,12 +8,12 @@ import "../styles/mybooks.css";
 import CreateBookModal from "./CreateBookModal";
 import Stack from "@mui/material/Stack";
 import BookModal from "./BookModal";
-import FetchHelper from "../fetchHelper";
 import SearchField from "./SearchField";
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import SearchIcon from '@mui/icons-material/Search';
+import { useRouteContext } from "../context/RouteContext";
 
 export default function HomeScreen({
     setScreen,
@@ -21,10 +21,8 @@ export default function HomeScreen({
     onViewMyBooks,
     onViewChapter,
     books = [],
-    setBooks,
     fetchBooks,
     fetchClientBooks,
-    username = "your username",
     removeLocalSessionData,
 }) {
     const [bookListCall, setBookListCall] = useState({ state: "inactive" });
@@ -44,7 +42,9 @@ export default function HomeScreen({
     const [search, setSearch] = useState("");
     const [searchMode, setSearchMode] = useState("name");
 
-    const isAuthor = localStorage.getItem("authorId") !== "null" && localStorage.getItem("authorId") !== null;
+    const isAuthor = localStorage.getItem("authorId") !== "null";
+
+    const { setCurrentRoute } = useRouteContext();
 
     const loadBooks = async (sourceBooks, bookOffset = bookRange) => {
 
@@ -103,6 +103,8 @@ export default function HomeScreen({
                 { label: "No. of Genres", value: genresCount, icon: "file", color: "#ecb43aff" },
             ]);
             setBookListCall({ state: "success" });
+
+            setCurrentRoute("/home");
         } catch (err) {
             console.error(err);
             setError("Failed to load books. Try again.");
@@ -227,7 +229,7 @@ export default function HomeScreen({
                 </> : <div className="mybooks-root">
                     <main className="mybooks-main">
 
-                        <Stack direction="horizontal" style={{ justifyContent: "center" }}>
+                        <Stack direction="horizontal" style={{ justifyContent: "center" }} gap={1}>
                             <SearchField value={search} onChange={setSearch} />
                             <button className="ds-btn ds-btn-primary" style={{ height: "30px", marginTop: "12px", paddingTop: "4px" }}
                                 onClick={
@@ -274,7 +276,7 @@ export default function HomeScreen({
                             ><KeyboardArrowRightIcon style={{ fontSize: "24px" }} /></button>
                         </Stack>
 
-                        <div className="books-list">
+                        <div className="books-list" style={{ marginLeft: 26 }}>
                             {
                                 bookList.map(b => (
                                     <div className="book-card" key={b.id}>
@@ -303,8 +305,8 @@ export default function HomeScreen({
                         onClose={() => setOpenBook(null)}
                         onViewChapter={onViewChapter}
                     />
-                </div>}
-        </div>
+                </div >}
+        </div >
     );
 }
 
