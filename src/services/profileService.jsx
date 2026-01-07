@@ -22,7 +22,12 @@ export async function getProfile(authorId) {
   if (localStorage.getItem("authorId") === "null") {
     result = await FetchHelper.profile.get({ id: authorId })
   } else {
-    result = await FetchHelper.profile.get({ id: localStorage.getItem("authorId") })
+    // Different profile loading for author on /author and /profile
+    if (!authorId) {
+      result = await FetchHelper.profile.get({ id: localStorage.getItem("authorId") })
+    } else {
+      result = await FetchHelper.profile.get({ id: authorId })
+    }
   }
 
   console.log(result)

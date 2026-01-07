@@ -67,7 +67,14 @@ export default function ProfileScreen({ setScreen }) {
     (async () => {
       setLoading(true);
       try {
-        const p = await getProfile(authorId);
+        let p = null;
+
+        if (window.location.pathname === "/profile") {
+          p = await getProfile();
+        } else {
+          p = await getProfile(authorId);
+        }
+
         if (!mounted) return;
 
         console.log(profile);

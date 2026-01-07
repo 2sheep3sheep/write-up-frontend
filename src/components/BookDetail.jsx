@@ -43,8 +43,6 @@ export default function BookDetail({
 
   const [canEdit, setCanEdit] = useState(false);
 
-  const isAuthor = localStorage.getItem("authorId") !== "null";
-
   const { currentRoute } = useRouteContext();
 
   const loadBook = async () => {
@@ -205,13 +203,11 @@ export default function BookDetail({
         <BackArrow style={{ left: "0px", marginBottom: "24px", width: 80 }} onClick={() => setScreen(currentRoute, -1)}>Back</BackArrow>
         <h1 className="book-title">{book?.name}</h1>
         <p className="book-desc">{book?.description}</p>
-        {!isAuthor &&
-          <button
-            className="add-btn"
-            onClick={() => setScreen(`/author/${authorId}`, 1)}>
-            Author's Profile
-          </button>
-        }
+        <button
+          className="add-btn"
+          onClick={() => setScreen(`/author/${authorId}`, 1)}>
+          Author's Profile
+        </button>
 
         <div className="chapter-header">
           <h2>Chapters</h2>
