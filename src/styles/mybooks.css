@@ -19,8 +19,8 @@
 
 .mybooks-main {
   flex: 1 1 auto;
-  max-width: 480px;
-  margin: 0 auto;
+  margin: 0;
+  width: auto;
   padding: 36px 16px 90px;
   /* leave space for navbar */
   box-sizing: border-box;
@@ -56,11 +56,13 @@
 }
 
 .books-list {
+  margin: 0;
   margin-top: 26px;
   padding: 0 24px 40px;
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 22px;
-  width: 240px;
 }
 
 .no-books {
@@ -76,6 +78,12 @@
   border-radius: 24px;
   padding: 22px;
   box-shadow: 0 6px 18px rgba(6, 18, 28, 0.3);
+  height: 160px;
+  min-width: min-content;
+  min-height: min-content;
+  flex-basis: 360px;
+  flex-grow: 1;
+  max-width: 480px;
 }
 
 .book-title {
@@ -86,7 +94,7 @@
 }
 
 .book-meta {
-  margin-bottom: 18px;
+  margin-bottom: auto;
   color: var(--muted);
 }
 

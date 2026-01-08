@@ -13,6 +13,7 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import SearchIcon from '@mui/icons-material/Search';
 import { useRouteContext } from "../context/RouteContext";
+import { Grid } from "@mui/material";
 
 export default function DiscoverScreen({
     setScreen,
@@ -136,7 +137,7 @@ export default function DiscoverScreen({
                         </Stack>
                     </Stack>
 
-                    <Stack direction="horizontal" style={{ justifyContent: "space-evenly" }}>
+                    <Stack direction="horizontal" style={{ justifyContent: "space-evenly",  maxWidth:"360px", margin:"0 auto" }}>
                         <button className="ds-btn"
                             onClick={() => {
                                 setBookRange(0)
@@ -163,7 +164,7 @@ export default function DiscoverScreen({
                         ><KeyboardArrowRightIcon style={{ fontSize: "24px" }} /></button>
                     </Stack>
 
-                    <div className="books-list" style={{ marginLeft: 26 }}>
+                    <div className="books-list">
                         {
                             bookList.map(b => (
                                 <div className="book-card" key={b.id}>
@@ -182,7 +183,7 @@ export default function DiscoverScreen({
                                     </div>
                                 </div>
                             ))}
-                    </div>
+                        </div>
                 </main>
 
                 <footer className="home-footer">
