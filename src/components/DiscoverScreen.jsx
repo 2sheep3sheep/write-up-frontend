@@ -13,7 +13,6 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import SearchIcon from '@mui/icons-material/Search';
 import { useRouteContext } from "../context/RouteContext";
-import { Grid } from "@mui/material";
 
 export default function DiscoverScreen({
     setScreen,
@@ -55,19 +54,7 @@ export default function DiscoverScreen({
         setBookListCall({ state: "pending" });
         setError(null);
         try {
-            //await new Promise((r) => setTimeout(r, 200));
             let sb = Array.isArray(sourceBooks) && sourceBooks.length ? sourceBooks : [];
-            /*
-            if (!sb) {
-                try {
-                    const raw = localStorage.getItem("mybooks");
-                    sb = raw ? JSON.parse(raw) : [];
-                } catch {
-                    sb = [];
-                }
-            }
-            */
-
             sb = sb.sort((a, b) => { return new Date(b.updatedAt) - new Date(a.updatedAt) })
 
             setBookListCall({ state: "success" });
@@ -79,10 +66,16 @@ export default function DiscoverScreen({
         }
     };
 
-
     useEffect(() => {
         loadBooks(books);
     }, [books]);
+
+    // Reload books on empty search
+    useEffect(() => {
+        if (search === "") {
+            loadBooks(null, 0);
+        }
+    }, [search]);
 
     const handleLogout = () => {
         setLogoutCall({ state: "pending" });
@@ -137,7 +130,7 @@ export default function DiscoverScreen({
                         </Stack>
                     </Stack>
 
-                    <Stack direction="horizontal" style={{ justifyContent: "space-evenly",  maxWidth:"360px", margin:"0 auto" }}>
+                    <Stack direction="horizontal" style={{ justifyContent: "space-evenly", maxWidth: "360px", margin: "0 auto" }}>
                         <button className="ds-btn"
                             onClick={() => {
                                 setBookRange(0)
@@ -154,7 +147,9 @@ export default function DiscoverScreen({
                             }}
                         ><KeyboardArrowLeftIcon style={{ fontSize: "24px" }} /></button>
 
-                        {`${bookRange} - ${bookRange + 20}`}
+                        <div style={{ display: "flex", alignItems: "center" }}>
+                            {`${bookRange} - ${bookRange + 20}`}
+                        </div>
 
                         <button className="ds-btn"
                             onClick={() => {
@@ -183,7 +178,7 @@ export default function DiscoverScreen({
                                     </div>
                                 </div>
                             ))}
-                        </div>
+                    </div>
                 </main>
 
                 <footer className="home-footer">

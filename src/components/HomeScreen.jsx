@@ -112,10 +112,16 @@ export default function HomeScreen({
         }
     };
 
-
     useEffect(() => {
         loadBooks(books);
     }, [books]);
+
+    // Reload books on empty search
+    useEffect(() => {
+        if (search === "") {
+            loadBooks(null, 0);
+        }
+    }, [search]);
 
     const handleLogout = () => {
         setLogoutCall({ state: "pending" });
@@ -249,7 +255,7 @@ export default function HomeScreen({
                             </Stack>
                         </Stack>
 
-                        <Stack direction="horizontal" style={{ justifyContent: "space-evenly" }}>
+                        <Stack direction="horizontal" style={{ justifyContent: "space-evenly", maxWidth: "360px", margin: "0 auto" }}>
                             <button className="ds-btn"
                                 onClick={() => {
                                     setBookRange(0)
@@ -266,7 +272,9 @@ export default function HomeScreen({
                                 }}
                             ><KeyboardArrowLeftIcon style={{ fontSize: "24px" }} /></button>
 
-                            {`${bookRange} - ${bookRange + 20}`}
+                            <div style={{ display: "flex", alignItems: "center" }}>
+                                {`${bookRange} - ${bookRange + 20}`}
+                            </div>
 
                             <button className="ds-btn"
                                 onClick={() => {

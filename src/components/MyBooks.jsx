@@ -150,7 +150,7 @@ export default function MyBooks({
           className="ds-btn ds-btn-primary create-btn"
           onClick={() => setCreateOpen(true)}
           aria-label="Create new book"
-          style={{maxWidth:"420px", margin:"0 auto"}}
+          style={{ maxWidth: "420px", margin: "0 auto" }}
         >
           <span className="plus">+</span> <span> Create new book</span>
         </button>
