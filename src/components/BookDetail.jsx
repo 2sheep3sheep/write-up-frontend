@@ -275,7 +275,6 @@ export default function BookDetail({
           )}
         </div>
 
-        <PageNavbar />
 
         {/* Модалка редагування – тільки коли не readOnly */}
         {!readOnly && editorChapter && (
@@ -294,6 +293,10 @@ export default function BookDetail({
           />
         )}
       </div>
+      
+      <footer className="mybooks-footer">
+        <PageNavbar setScreen={setScreen} />
+      </footer>
     </div>
   );
 }

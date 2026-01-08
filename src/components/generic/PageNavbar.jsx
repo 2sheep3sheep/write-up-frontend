@@ -7,9 +7,20 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 import PersonIcon from "@mui/icons-material/Person";
 import "./page-navbar.css"; // шлях до css (постав вірний)
 
-export default function PageNavbar(navTo) {
+export default function PageNavbar(props) {
   const navigate = useNavigate();
   const loc = useLocation();
+
+  const navTo = props.setScreen;
+
+  const dirTo = (newPath) => {
+    const pathList = ["/home","/discover","/mybooks","/profile"]
+    const currentIndex = pathList.findIndex( (e) => e===loc.pathname ) 
+    const newIndex = pathList.findIndex( (e) => e===newPath )
+
+
+    return currentIndex < newIndex ? 1 : -1;
+  };
 
   const nav = (path) => {
     if (loc.pathname !== path) navigate(path);
@@ -26,7 +37,7 @@ export default function PageNavbar(navTo) {
       <div className="page-navbar" role="navigation" aria-label="Bottom navigation">
         <button
           className={`nav-btn ${loc.pathname === "/home" ? "active" : ""}`}
-          onClick={() => nav("/home")}
+          onClick={() => navTo("/home", dirTo("/home") )}
         >
           <HomeIcon className="nav-icon" />
           <div className="nav-label">Home</div>
@@ -34,7 +45,7 @@ export default function PageNavbar(navTo) {
 
         <button
           className={`nav-btn ${loc.pathname === "/discover" ? "active" : ""}`}
-          onClick={() => nav("/discover")}
+          onClick={() => navTo("/discover", dirTo("/discover"))}
         >
           <SearchIcon className="nav-icon" />
           <div className="nav-label">Discover</div>
@@ -42,7 +53,7 @@ export default function PageNavbar(navTo) {
 
         <button
           className={`nav-btn ${loc.pathname === "/mybooks" ? "active" : ""}`}
-          onClick={() => nav("/mybooks")}
+          onClick={() => navTo("/mybooks", dirTo("/mybooks"))}
         >
           <MenuBookIcon className="nav-icon" />
           <div className="nav-label">My Books</div>
@@ -50,7 +61,7 @@ export default function PageNavbar(navTo) {
 
         <button
           className={`nav-btn ${loc.pathname === "/profile" ? "active" : ""}`}
-          onClick={() => nav("/profile")}
+          onClick={() => navTo("/profile", dirTo("/profile"))}
         >
           <PersonIcon className="nav-icon" />
           <div className="nav-label">Profile</div>

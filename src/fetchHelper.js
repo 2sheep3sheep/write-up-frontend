@@ -1,5 +1,8 @@
 function dataURLToBlob(dataUrl) {
     const [header, base64] = dataUrl.split(",");
+    
+    console.log(header)
+
     const mimeMatch = header.match(/:(.*?);/);
     const mime = mimeMatch ? mimeMatch[1] : "application/octet-stream";
 
