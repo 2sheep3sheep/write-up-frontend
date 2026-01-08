@@ -40,7 +40,7 @@ export default function ProfileScreen({ setScreen }) {
   const errors = useMemo(() => validate(form), [form]);
   const fileInputRef = useRef(null);
 
-  const isAuthor = window.location.pathname === "/profile";
+  const myProfile = window.location.pathname === "/profile";
 
   const { currentBook } = useBookContext();
   const bookId = currentBook?.id;
@@ -48,50 +48,40 @@ export default function ProfileScreen({ setScreen }) {
 
   const [authorBooks, setAuthorBooks] = useState([])
 
+  const fetchAuthorProfile = async () => {
+    setLoading(true);
+
+    try {
+      const p = await getProfile(authorId);
+
+      setProfile(p);
+      setForm({
+        bio: p.bio ?? "",
+        imgUrl: p.imgUrl ?? ""
+      });
+
+      setLoading(false);
+    } catch (e) {
+      console.log(e.message);
+    }
+  }
+
   const fetchAuthorBooks = async () => {
-    if (authorId == "null" || !authorId) {
-      return [];
-    } else {
-      const fetchedBooks = await FetchHelper.books.list({ authorId })
-      console.log(fetchedBooks.response)
-      setAuthorBooks(fetchedBooks.response)
+    setLoading(true);
+
+    try {
+      const books = await FetchHelper.books.list({ authorId })
+      setAuthorBooks(books.response)
+
+      setLoading(false);
+    } catch (e) {
+      console.log(e.message);
     }
   }
 
   useEffect(() => {
+    fetchAuthorProfile();
     fetchAuthorBooks();
-  }, []);
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      setLoading(true);
-      try {
-        let p = null;
-
-        if (window.location.pathname === "/profile") {
-          p = await getProfile();
-        } else {
-          p = await getProfile(authorId);
-        }
-
-        if (!mounted) return;
-
-        console.log(profile);
-
-        setProfile(p);
-        setForm({
-          bio: p.bio ?? "",
-          imgUrl: p.imgUrl ?? ""
-        });
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    })();
-
-    return () => {
-      mounted = false;
-    };
   }, []);
 
   function onChange(e) {
@@ -150,7 +140,7 @@ export default function ProfileScreen({ setScreen }) {
   if (loading) {
     return (
       <div className="page">
-        <div className="title">{isAuthor ? "My Profile" : "Author's Profile"}</div>
+        <div className="title">{myProfile ? "My Profile" : "Author's Profile"}</div>
         <div className="panel">Loading...</div>
         <footer className="profile-footer">
           <PageNavbar setScreen={setScreen} />
@@ -162,108 +152,81 @@ export default function ProfileScreen({ setScreen }) {
   // ===== VIEW MODE =====
   if (!isEditing) {
     return (
-      isAuthor ?
-        <div className="page">
-          <div className="title">My Profile</div>
-
-          <div className="section-title">Personal information</div>
-          <div className="panel" style={{ display: "flex", gap: 14, alignItems: "center" }}>
-            <div className="avatar-wrap">
-              {profile?.imgUrl ? (
-                <img
-                  src={profile.imgUrl}
-                  alt="avatar"
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
-              ) : (
-                <div style={{ fontSize: 30, opacity: 0.65 }}>👤</div>
-              )}
-            </div>
-
-            <div style={{ lineHeight: 1.45 }}>
-              <div style={{ fontSize: 16, opacity: 0.65 }}>Name</div>
-              <div style={{ fontSize: 20, fontWeight: 900 }}>{profile?.username}</div>
-            </div>
-          </div>
-
-          <div className="section-title">Contact</div>
-          <div className="panel">
-            <div className="input-like">{profile?.email}</div>
-          </div>
-
-          <div className="section-title">Bio</div>
-          <div className="panel">
-            <div className="input-like" style={{ minHeight: 130, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>
-              {profile?.bio}
-            </div>
-          </div>
-
-          <button className="primary-big" onClick={startEdit}>
-            Edit Profile
-          </button>
-
-          <footer className="profile-footer">
-            <PageNavbar setScreen={setScreen} />
-          </footer>
-        </div> :
-        <div className="page">
+      <div className="page">
+        {!myProfile &&
           <div className="back-btn" style={{ marginBottom: 30 }}>
             <BackArrow onClick={() => setScreen(`/book/${bookId}`, -1)}>Back</BackArrow>
           </div>
+        }
 
-          <div className="title">Author's Profile</div>
+        <div className="title">{myProfile ? "My Profile" : "Author's Profile"}</div>
 
-          <div className="section-title">Personal information</div>
-          <div className="panel" style={{ display: "flex", gap: 14, alignItems: "center" }}>
-            <div className="avatar-wrap">
-              {profile?.imgUrl ? (
-                <img
-                  src={profile.imgUrl}
-                  alt="avatar"
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
-              ) : (
-                <div style={{ fontSize: 30, opacity: 0.65 }}>👤</div>
-              )}
-            </div>
-
-            <div style={{ lineHeight: 1.45 }}>
-              <div style={{ fontSize: 16, opacity: 0.65 }}>Name</div>
-              <div style={{ fontSize: 20, fontWeight: 900 }}>{profile?.username}</div>
-            </div>
+        <div className="section-title">Personal information</div>
+        <div className="panel" style={{ display: "flex", gap: 14, alignItems: "center" }}>
+          <div className="avatar-wrap">
+            {profile?.imgUrl ? (
+              <img
+                src={profile.imgUrl}
+                alt="avatar"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            ) : (
+              <div style={{ fontSize: 30, opacity: 0.65 }}>👤</div>
+            )}
           </div>
 
-          <div className="section-title">Contact</div>
-          <div className="panel">
-            <div className="input-like">{profile?.email}</div>
-          </div>
-
-          <div className="section-title">Bio</div>
-          <div className="panel">
-            <div className="input-like" style={{ minHeight: 130, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>
-              {profile?.bio}
-            </div>
-          </div>
-
-          <div className="section-title">Books</div>
-          <div className="recent-list" role="list">
-            {
-              authorBooks.map((b) => (
-                <div className="recent-item" key={b.id} role="listitem" onClick={() => setScreen(`book/${b.id}`, 1)}>
-                  <div className="recent-icon">📗</div>
-                  <div className="recent-body">
-                    <div className="recent-title">{b.name}</div>
-                    <div className="recent-meta">
-                      <span>{b.genre}</span>
-                      <span> • </span>
-                      <span>⏱ {b.updatedAt || "—"}</span>
-                    </div>
-                  </div>
-                </div>
-              ))
-            }
+          <div style={{ lineHeight: 1.45 }}>
+            <div style={{ fontSize: 16, opacity: 0.65 }}>Name</div>
+            <div style={{ fontSize: 20, fontWeight: 900 }}>{profile?.username}</div>
           </div>
         </div>
+
+        <div className="section-title">Contact</div>
+        <div className="panel">
+          <div className="input-like">{profile?.email}</div>
+        </div>
+
+        <div className="section-title">Bio</div>
+        <div className="panel">
+          <div className="input-like" style={{ minHeight: 130, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>
+            {profile?.bio}
+          </div>
+        </div>
+
+        {myProfile &&
+          <div>
+            <button className="primary-big" onClick={startEdit}>
+              Edit Profile
+            </button>
+            <footer className="profile-footer">
+              <PageNavbar setScreen={setScreen} />
+            </footer>
+          </div>
+        }
+
+        {!myProfile &&
+          <div>
+            <div className="section-title">Books</div>
+            <div className="recent-list" role="list">
+              {
+                authorBooks.map((b) => (
+                  <div className="recent-item" key={b.id} role="listitem" onClick={() => setScreen(`book/${b.id}`, 1)}>
+                    <div className="recent-icon">📗</div>
+                    <div className="recent-body">
+                      <div className="recent-title">{b.name}</div>
+                      <div className="recent-meta">
+                        <span>{b.genre}</span>
+                        <span> • </span>
+                        <span>⏱ {b.updatedAt || "—"}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+        }
+      </div>
     );
   }
 
