@@ -45,6 +45,10 @@ async function Upload(baseUri, dtoIn) {
             } catch (e) { }
         }
 
+        if (response.status === 413) {
+            alert("Uploaded image is too large!");
+        }
+
         return { ok: response.ok, status: response.status, response: data };
     } catch (e) {
         console.log(e)
